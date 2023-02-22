@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
 
+from api.models import Category
+
 
 # TODO: Return type should be list of case models when they are implemented
 def get_case(parameters: Dict[str, Any]):
@@ -16,8 +18,4 @@ def get_case_categories() -> List[Dict[str, Any]]:
     """
     Returns all case categories.
     """
-    # Return dummy data
-    return [{"id": 1, "name": "category1"},
-            {"id": 2, "name": "category2"},
-            {"id": 3, "name": "category3"},
-            {"id": 4, "name": "category4"}]
+    return list(Category.objects.all().values())
