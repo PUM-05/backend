@@ -21,6 +21,13 @@ def case(request: HttpRequest) -> HttpResponse:
         return HttpResponse(cases_json, content_type="application/json", status=200)
 
     elif request.method == "POST":
+        try:
+            json = request.body.decode()
+            dictionary = json.loads(json)
+            cases.create_case(dictionary)
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
+            return HttpRequest(status=400)
+
         return HttpResponse(status=201)
 
 
