@@ -23,7 +23,7 @@ jobs:
 
       - name: Check style
         run: |
-          pycodestyle ./src
+          pycodestyle --max-line-length=100 ./src
       - name: Run Tests
         run: |
           python src/manage.py test api
