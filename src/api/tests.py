@@ -2,6 +2,7 @@ from django.test import TestCase
 
 # Create your tests here.
 
+
 class APITests(TestCase):
     def test_example(self):
         response = self.client.get('/api/example')
