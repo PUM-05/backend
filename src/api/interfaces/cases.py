@@ -14,7 +14,11 @@ def get_case(parameters: Dict[str, Any]):
             {"id": 2, "medium": "email", "notes": "This is a test."}]
 
 
-def validate_case(dictionary: Dict):
+def validate_case(dictionary: Dict) -> bool:
+    """
+    Returns true if all keys in the given dictionary are valid,
+    false otherwise.
+    """
     list_of_keys = {"notes", "medium", "customer_time",
                     "additional_time", "form_fill_time", "category_id"}
     for key in dictionary.keys():
@@ -23,7 +27,11 @@ def validate_case(dictionary: Dict):
     return True
 
 
-def create_case(dictionary: Dict):
+def create_case(dictionary: Dict) -> None:
+    """
+    Creates a new case and adds it to the data base. Raises ValueError if 
+    the data is incorrect.
+    """
     if not validate_case:
         raise ValueError
 
