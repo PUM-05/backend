@@ -12,14 +12,16 @@ class Customer(models.Model):
 
 
 class Case(models.Model):
-    notes = models.TextField()
-    medium = models.CharField(max_length=50)
-    customer_time = models.DurationField()
-    additional_time = models.DurationField()
-    form_fill_time = models.DurationField()
-    created_at = models.DateTimeField()
-    edited_at = models.DateTimeField()
+    notes = models.TextField(null=True)
+    medium = models.CharField(max_length=50, null=True)
+    customer_time = models.DurationField(null=True)
+    additional_time = models.DurationField(null=True)
+    form_fill_time = models.DurationField(null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    edited_at = models.DateTimeField(auto_now=True)
 
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(
+        Category, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, null=True)
     user = models.ManyToManyField(User)

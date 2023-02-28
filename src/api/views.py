@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
 import json
+from json.decoder import JSONDecodeError
 
 from .interfaces import cases
 
@@ -21,6 +22,14 @@ def case(request: HttpRequest) -> HttpResponse:
         return HttpResponse(cases_json, content_type="application/json", status=200)
 
     elif request.method == "POST":
+        try:
+            json_string = request.body.decode()
+            dictionary = json.loads(json_string)
+            cases.create_case(dictionary)
+
+        except (JSONDecodeError, UnicodeDecodeError, ValueError):
+            return HttpResponse(status=400)
+
         return HttpResponse(status=201)
 
 
