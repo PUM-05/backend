@@ -26,6 +26,7 @@ def case(request: HttpRequest) -> HttpResponse:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
             cases.create_case(dictionary)
+
         except (JSONDecodeError, UnicodeDecodeError, ValueError):
             return HttpResponse(status=400)
 
