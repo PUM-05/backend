@@ -29,7 +29,7 @@ def validate_case(dictionary: Dict) -> bool:
 
 def create_case(dictionary: Dict) -> None:
     """
-    Creates a new case and adds it to the data base. Raises ValueError if 
+    Creates a new case and adds it to the data base. Raises ValueError if
     the data is incorrect.
     """
     if not validate_case:
@@ -38,12 +38,9 @@ def create_case(dictionary: Dict) -> None:
     case = Case()
 
     case.notes = dictionary.get("notes")
-    case.customer_time = timedelta(
-        seconds=dictionary.get("customer_time") or 0)
-    case.additional_time = timedelta(
-        seconds=dictionary.get("additional_time") or 0)
-    case.form_fill_time = timedelta(
-        seconds=dictionary.get("form_fill_time") or 0)
+    case.customer_time = timedelta(seconds=dictionary.get("customer_time") or 0)
+    case.additional_time = timedelta(seconds=dictionary.get("additional_time") or 0)
+    case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time") or 0)
 
     medium = dictionary.get("medium")
     if "medium" in dictionary and (medium != "phone" and medium != "email"):
@@ -55,7 +52,7 @@ def create_case(dictionary: Dict) -> None:
     if "category_id" in dictionary:
         try:
             category = Category.objects.get(id=dictionary.get("category_id"))
-        except:
+        except Category.DoesNotExist:
             raise ValueError
 
         case.category = category
