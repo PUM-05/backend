@@ -24,7 +24,8 @@ class APITests(TestCase):
             category = (i % 5) + 1
 
             dictionary = {"notes": notes, "medium": medium, "customer_time": customer_time,
-                          "form_fill_time": form_fill_time, "additional_time": additional_time, "category_id": category}
+                          "form_fill_time": form_fill_time, "additional_time": additional_time,
+                          "category_id": category}
 
             response = self.client.post(
                 "/api/case", dictionary, content_type="application/json")

@@ -29,7 +29,7 @@ def validate_case(dictionary: Dict) -> bool:
 
 def create_case(dictionary: Dict) -> None:
     """
-    Creates a new case and adds it to the data base. Raises ValueError if 
+    Creates a new case and adds it to the data base. Raises ValueError if
     the data is incorrect.
     """
     if not validate_case:
@@ -55,7 +55,7 @@ def create_case(dictionary: Dict) -> None:
     if "category_id" in dictionary:
         try:
             category = Category.objects.get(id=dictionary.get("category_id"))
-        except:
+        except Category.DoesNotExist:
             raise ValueError
 
         case.category = category
