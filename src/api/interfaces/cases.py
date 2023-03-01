@@ -38,12 +38,9 @@ def create_case(dictionary: Dict) -> None:
     case = Case()
 
     case.notes = dictionary.get("notes")
-    case.customer_time = timedelta(
-        seconds=dictionary.get("customer_time") or 0)
-    case.additional_time = timedelta(
-        seconds=dictionary.get("additional_time") or 0)
-    case.form_fill_time = timedelta(
-        seconds=dictionary.get("form_fill_time") or 0)
+    case.customer_time = timedelta(seconds=dictionary.get("customer_time") or 0)
+    case.additional_time = timedelta(seconds=dictionary.get("additional_time") or 0)
+    case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time") or 0)
 
     medium = dictionary.get("medium")
     if "medium" in dictionary and (medium != "phone" and medium != "email"):

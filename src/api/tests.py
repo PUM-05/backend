@@ -1,8 +1,6 @@
 from django.test import TestCase
 from api.models import Category
 
-# Create your tests here.
-
 
 class APITests(TestCase):
 
@@ -14,7 +12,6 @@ class APITests(TestCase):
         Category.objects.create(name="test5")
 
     def test_create_case_correct(self) -> None:
-
         for i in range(10):
             notes = "notes" + str(i)
             medium = "email" if i % 2 else "phone"
@@ -27,8 +24,7 @@ class APITests(TestCase):
                           "form_fill_time": form_fill_time, "additional_time": additional_time,
                           "category_id": category}
 
-            response = self.client.post(
-                "/api/case", dictionary, content_type="application/json")
+            response = self.client.post("/api/case", dictionary, content_type="application/json")
 
             self.assertEqual(response.status_code, 201)
 
@@ -36,11 +32,9 @@ class APITests(TestCase):
         category = 6
         notes = "notes"
         medium = "email"
-        dictionary = {"notes": notes,
-                      "medium": medium, "category_id": category}
+        dictionary = {"notes": notes, "medium": medium, "category_id": category}
 
-        response = self.client.post(
-            "/api/case", dictionary, content_type="application/json")
+        response = self.client.post("/api/case", dictionary, content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
 
@@ -48,10 +42,8 @@ class APITests(TestCase):
         category = 5
         notes = "notes"
         medium = "tiktok"
-        dictionary = {"notes": notes,
-                      "medium": medium, "category_id": category}
+        dictionary = {"notes": notes, "medium": medium, "category_id": category}
 
-        response = self.client.post(
-            "/api/case", dictionary, content_type="application/json")
+        response = self.client.post("/api/case", dictionary, content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
