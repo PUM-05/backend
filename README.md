@@ -3,24 +3,33 @@
 # Backend readme
 Contains instructions for setting up and running the backend part of the Personalkollen project.
 
+
+
 # Requirements
 - Python 3.10 (or later)
 - Git
 - Pip
 
 # Setup
+> Note:
+> If using Windows make sure you change occurences of "/" to "\" (or use bash terminal).
 
 - Git clone the repository to your local machine.
 - Navigate to the project folder in your terminal.
-- Create a virtual environmnent and activate it:
+- Create a virtual environmnent and activate it (for MacOS/Linux):
 ```
 python3 -m venv .venv
 source .venv/bin/activate
 ```
+- Create a virtual environmnent and activate it (for Windows):
+```
+python3 -m venv .venv
+source .venv/Scripts/activate
+```
 
 - Install requirements:
 ```
-pip install -r requirements
+pip install -r requirements/requirements.txt
 ```
 
 - Setup local database:
