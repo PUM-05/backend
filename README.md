@@ -12,7 +12,8 @@ Contains instructions for setting up and running the backend part of the Persona
 
 # Setup
 > Note:
-> If using Windows make sure you change occurences of "/" to "\" (or use bash terminal).
+> If using Windows make sure you change occurences of "/" to "\\" (or use bash terminal),
+> also you may need to change occurences of "python3" to "python".
 
 - Git clone the repository to your local machine.
 - Navigate to the project folder in your terminal.
