@@ -9,8 +9,6 @@ def static_files(request: HttpRequest) -> HttpResponse:
     """
     path = request.path
 
-    print("AAAAA" + path)
-
     if should_return_index(path):
         return render(request, 'index.html')
 
