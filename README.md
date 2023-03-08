@@ -1,4 +1,7 @@
 ![](https://github.com/PUM-05/backend/actions/workflows/django.yml/badge.svg)
+![](https://github.com/PUM-05/backend/actions/workflows/style.yml/badge.svg)
+![](https://github.com/PUM-05/backend/actions/workflows/sonar.yml/badge.svg)
+
 
 # Backend readme
 Contains instructions for setting up and running the backend part of the Personalkollen project.
