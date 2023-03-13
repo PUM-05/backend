@@ -15,13 +15,13 @@ def static_files(request: HttpRequest) -> HttpResponse:
     else:
         try:
             static_path = path[1:]
-            file = open('src/static/' + static_path, 'rb')
+            static_file = open('src/static/' + static_path, 'rb')
         except FileNotFoundError:
             return HttpResponse(status=404)
 
-        type = mimetypes.guess_type(path)[0]
+        file_type = mimetypes.guess_type(path)[0]
 
-        return FileResponse(file, content_type=type)
+        return FileResponse(static_file, content_type=file_type)
 
 
 def should_return_index(path: str) -> bool:
