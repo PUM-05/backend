@@ -1,13 +1,10 @@
 from django.http import HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
+from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
 
 from .interfaces import cases
-
-
-def example(request):
-    return HttpResponse("Hello World!")
 
 
 @require_http_methods({"GET", "POST"})
@@ -18,7 +15,13 @@ def case(request: HttpRequest) -> HttpResponse:
     """
     if request.method == "GET":
         params = request.GET.dict()
-        cases_json = json.dumps(cases.get_case(params))
+
+        try:
+            matching_cases = cases.get_cases(params)
+        except ValueError:
+            return HttpResponse(status=400)
+
+        cases_json = json.dumps(matching_cases, cls=DjangoJSONEncoder)
         return HttpResponse(cases_json, content_type="application/json", status=200)
 
     elif request.method == "POST":

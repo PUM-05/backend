@@ -4,14 +4,12 @@ from typing import Any, Dict, List
 from api.models import Category, Case
 
 
-# TODO: Return type should be list of case models when they are implemented
-def get_case(parameters: Dict[str, Any]):
+def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     """
     Returns all cases that match the given parameters.
     """
-    # Return dummy data
-    return [{"id": 1, "medium": "phone", "notes": "Hello World!"},
-            {"id": 2, "medium": "email", "notes": "This is a test."}]
+    # TODO: Implement parameters
+    return list(Case.objects.all().values())
 
 
 def validate_case(dictionary: Dict) -> bool:
