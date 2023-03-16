@@ -1,5 +1,7 @@
+from datetime import timedelta
+import json
 from django.test import TestCase
-from api.models import Category
+from api.models import Category, Case
 from django.contrib.auth.models import User
 
 
@@ -11,6 +13,12 @@ class APITests(TestCase):
         Category.objects.create(name="test3")
         Category.objects.create(name="test4")
         Category.objects.create(name="test5")
+        
+        Case.objects.create()
+        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
+        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
+                            additional_time=timedelta(seconds=20), notes="This is a note.",
+                            customer_time=timedelta(seconds=90), category_id=3)
 
         user1 = User.objects.create(username="user1")
         user1.set_password("")
@@ -110,3 +118,14 @@ class APITests(TestCase):
         response = self.client.post("/api/case", dictionary, content_type="application/json")
 
         self.assertEqual(response.status_code, 400)
+
+    def test_get_case_without_parameters(self) -> None:
+        response = self.client.get("/api/case")
+        content = response.content.decode()
+        data = json.loads(content)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0]["medium"], None)
+        self.assertEqual(data[1]["medium"], "phone")
+        self.assertEqual(data[2]["medium"], "email")
