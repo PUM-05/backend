@@ -29,8 +29,11 @@ def logout(request: HttpRequest) -> HttpResponse:
     """
     Logs out the current user.
     """
-    auth.logout_user(request)
-    return HttpResponse(status=200)
+    if request.user.is_authenticated:
+        auth.logout_user(request)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
 
 
 def check(request: HttpRequest) -> HttpResponse:
