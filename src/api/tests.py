@@ -13,7 +13,7 @@ class APITests(TestCase):
         Category.objects.create(name="test3")
         Category.objects.create(name="test4")
         Category.objects.create(name="test5")
-        
+
         Case.objects.create()
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
