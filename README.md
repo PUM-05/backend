@@ -46,6 +46,21 @@ python3 src/manage.py migrate
 python3 src/manage.py test api
 ```
 
+# Deploy static files from frontend
+> Note:
+> This additionally requires that backend/ and frontend/ reside in the same parent directory and
+> that Node.js and npm are installed.
+
+- Pull the main branch of both directories.
+- Build frontend:
+```
+npm run build
+```
+- Go to the backend directory and run the script:
+```
+bash deploy.sh
+```
+
 # Starting the server
 - Run the server:
 ```
