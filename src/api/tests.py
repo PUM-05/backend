@@ -53,7 +53,7 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_create_case_incorrect_medium(self) -> None:
-        category = 51
+        category = 5
         notes = "notes"
         medium = "tiktok"
         dictionary = {"notes": notes, "medium": medium, "category_id": category}
