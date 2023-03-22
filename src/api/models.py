@@ -9,6 +9,9 @@ class Category(models.Model):
                                related_name='children', parent_link=True)
 
     def save(self, *args, **kwargs):
+        """
+        Override save() to also set the correct value of level based on parent "depth"
+        """
         if self.level == 0:
             self.level = 1
             p = self.parent
