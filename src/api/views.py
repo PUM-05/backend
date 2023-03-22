@@ -52,7 +52,7 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
 @require_http_methods({"GET"})
 def case_categories(request: HttpRequest) -> HttpResponse:
     """
-    Returns all case categories as a JSON array.
+    Returns all top lvl case categories as a JSON array.
     """
     categories_json = json.dumps(cases.get_case_categories())
     return HttpResponse(categories_json, content_type="application/json", status=200)

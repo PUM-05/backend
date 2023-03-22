@@ -27,7 +27,7 @@ def validate_case(dictionary: Dict) -> bool:
 
 def create_case(dictionary: Dict) -> None:
     """
-    Creates a new case and adds it to the data base. Raises ValueError if
+    Creates a new case and adds it to the database. Raises ValueError if
     the data is incorrect.
     """
     if not validate_case:

@@ -4,6 +4,21 @@ from django.contrib.auth.models import User
 
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    level = models.IntegerField(default=0)
+    parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True,
+                               related_name='children', parent_link=True)
+
+    def save(self, *args, **kwargs):
+        if self.level == 0:
+            self.level = 1
+            p = self.parent
+            while p:
+                p = p.parent
+                self.level = self.level + 1
+        super(Category, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['id', 'level']
 
 
 class Customer(models.Model):
