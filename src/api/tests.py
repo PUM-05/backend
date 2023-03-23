@@ -82,7 +82,6 @@ class APITests(TestCase):
 
         self.assertEqual(len(data), 8)
         self.assertEqual(data[3]["parent_id"], None)
-        self.assertEqual(data[5]["parent_id"], 5)
-        self.assertEqual(data[5]["parent_id"], 5)
         self.assertEqual(data[6]["parent_id"], 5)
         self.assertEqual(data[5]["parent_id"], 5)
+        self.assertEqual(data[7]["parent_id"], 6)
