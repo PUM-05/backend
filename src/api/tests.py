@@ -4,7 +4,7 @@ from django.test import TestCase
 from api.models import Category, Case
 
 CASE_PATH = "/api/case"
-JSON_PATH = "application/json"
+CONTENT_TYPE_JSON = "application/json"
 
 
 class APITests(TestCase):
@@ -38,7 +38,7 @@ class APITests(TestCase):
                           "form_fill_time": form_fill_time, "additional_time": additional_time,
                           "category_id": category}
 
-            response = self.client.post(CASE_PATH, dictionary, content_type=JSON_PATH)
+            response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
             self.assertEqual(response.status_code, 201)
 
@@ -48,7 +48,7 @@ class APITests(TestCase):
         medium = "email"
         dictionary = {"notes": notes, "medium": medium, "category_id": category}
 
-        response = self.client.post(CASE_PATH, dictionary, content_type=JSON_PATH)
+        response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
         self.assertEqual(response.status_code, 400)
 
@@ -58,7 +58,7 @@ class APITests(TestCase):
         medium = "tiktok"
         dictionary = {"notes": notes, "medium": medium, "category_id": category}
 
-        response = self.client.post(CASE_PATH, dictionary, content_type=JSON_PATH)
+        response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
         self.assertEqual(response.status_code, 400)
 
