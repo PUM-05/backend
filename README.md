@@ -46,6 +46,19 @@ python3 src/manage.py migrate
 python3 src/manage.py test api
 ```
 
+# Deploy static files from frontend
+> Note:
+> This additionally requires that Node.js and npm are installed.
+
+- Pull the main branch of both repositories.
+- Build frontend:
+```
+npm run build
+```
+- Delete everything in `backend/src/static/`
+- Move/Copy the files from `frontend/frontend-friends/build` into `backend/src/static/`
+
+
 # Starting the server
 - Run the server:
 ```
