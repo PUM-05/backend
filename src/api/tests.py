@@ -2,6 +2,7 @@ from datetime import timedelta
 import json
 from django.test import TestCase
 from api.models import Category, Case
+from django.contrib.auth.models import User
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
@@ -24,6 +25,68 @@ class APITests(TestCase):
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20), notes="This is a note.",
                             customer_time=timedelta(seconds=90), category_id=3)
+
+        user1 = User.objects.create(username="user1")
+        user1.set_password("")
+        user1.save()
+        user2 = User.objects.create(username="user2")
+        user2.set_password("password2")
+        user2.save()
+
+    def test_login_correct(self) -> None:
+        """
+        Tests that the login endpoint returns a 200 status code and a session
+        cookie when the login is successful.
+        """
+        response = self.client.post("/api/login", {"username": "user1"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.cookies["sessionid"].value) > 0)
+
+        response = self.client.post("/api/login", {"username": "user2", "password": "password2"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(len(response.cookies["sessionid"].value) > 0)
+
+    def test_login_incorrect(self) -> None:
+        """
+        Tests that the login endpoint returns a 401 status code when the login
+        is unsuccessful.
+        """
+        response = self.client.post("/api/login", {"username": "user1", "password": "wrong"})
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.post("/api/login", {"username": "user2"})
+        self.assertEqual(response.status_code, 401)
+
+        response = self.client.post("/api/login", {"username": "wrong"})
+        self.assertEqual(response.status_code, 401)
+
+    def test_logout(self) -> None:
+        """
+        Tests that the logout endpoint returns a 200 status code when the user
+        is logged in and a 401 status code when the user is not logged in.
+        """
+        response = self.client.get("/api/logout")
+        self.assertEqual(response.status_code, 401)
+
+        self.client.login(username="user1", password="")
+
+        response = self.client.get("/api/logout")
+        self.assertEqual(response.status_code, 200)
+        response = self.client.get("/api/check")
+        self.assertEqual(response.status_code, 401)
+
+    def test_check(self) -> None:
+        """
+        Tests that the check endpoint returns a 200 status code when the user is
+        logged in and a 401 status code when the user is not logged in.
+        """
+        response = self.client.get("/api/check")
+        self.assertEqual(response.status_code, 401)
+
+        self.client.login(username="user1", password="")
+
+        response = self.client.get("/api/check")
+        self.assertEqual(response.status_code, 200)
 
     def test_create_case_correct(self) -> None:
         for i in range(10):

@@ -4,7 +4,43 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
 
-from .interfaces import cases
+from .interfaces import cases, auth
+
+
+def login(request: HttpRequest) -> HttpResponse:
+    """
+    Attempts to log in the user with the given username and password.
+    """
+    try:
+        success = auth.login_user(request)
+    except ValueError:
+        return HttpResponse(status=400)
+
+    if success:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def logout(request: HttpRequest) -> HttpResponse:
+    """
+    Logs out the current user.
+    """
+    if request.user.is_authenticated:
+        auth.logout_user(request)
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
+
+
+def check(request: HttpRequest) -> HttpResponse:
+    """
+    Checks if the user is logged in.
+    """
+    if request.user.is_authenticated:
+        return HttpResponse(status=200)
+    else:
+        return HttpResponse(status=401)
 
 
 @require_http_methods({"GET", "POST"})
