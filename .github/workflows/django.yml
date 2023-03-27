@@ -21,4 +21,4 @@ jobs:
           pip install -r ./requirements/dev.txt
       - name: Run Tests
         run: |
-          run src/manage.py test backend api
+          src/manage.py test backend api
