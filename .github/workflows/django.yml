@@ -6,10 +6,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
-      max-parallel: 4
+      max-parallel: 2
       matrix:
         python-version: ["3.10", "3.11"]
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
@@ -22,4 +21,4 @@ jobs:
           pip install -r ./requirements/dev.txt
       - name: Run Tests
         run: |
-          python src/manage.py test backend api
+          src/manage.py test backend api
