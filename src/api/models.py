@@ -23,12 +23,6 @@ class Category(models.Model):
                 self.level = self.level + 1
         super(Category, self).save(*args, **kwargs)
 
-    def can_have_children(self) -> bool:
-        """
-        Returns True if this category can have children
-        """
-        return self.level == 1
-
     class Meta:
         ordering = ['id', 'level']
         verbose_name_plural = "categories"

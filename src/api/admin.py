@@ -15,6 +15,8 @@ class CategoryCreationForm(forms.ModelForm):
     """
     Form for creating a new category in the admin panel.
     """
+    parent = forms.ModelChoiceField(queryset=Category.objects.filter(level=1))
+
     class Meta:
         model = Category
         fields = ('name', 'parent')
