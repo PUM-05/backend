@@ -8,7 +8,10 @@ class Category(models.Model):
     parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True,
                                related_name='children', parent_link=True)
 
-    def save(self, *args, **kwargs):
+    def __str__(self) -> str:
+        return self.name
+
+    def save(self, *args, **kwargs) -> None:
         """
         Override save() to also set the correct value of level based on parent "depth"
         """
@@ -20,8 +23,15 @@ class Category(models.Model):
                 self.level = self.level + 1
         super(Category, self).save(*args, **kwargs)
 
+    def can_have_children(self) -> bool:
+        """
+        Returns True if this category can have children
+        """
+        return self.level == 1
+
     class Meta:
         ordering = ['id', 'level']
+        verbose_name_plural = "categories"
 
 
 class Customer(models.Model):
