@@ -70,126 +70,156 @@ python3 src/manage.py runserver
 ## Authentication
 ### Login
 Logs in the user with the given credentials.
-- __Request__
-  ``` http
-  POST /api/login/
-  ```
-  ``` json
-  {
+The password field is not required, since some users may not have a password.
+An empty password filed will be treaded the same as if no password field was given.
+
+Request:
+``` http
+POST /api/login/
+
+{
     "username": "<username>",
     "password": "<password>"
-  }
-  ```
-- __Response__\
-    Success:
-    ``` http
-    Status: 200 (OK)
-    Set-Cookie: sessionid=...
-    ```
-    Wrong credentials:
-    ``` http
-    Status: 401 (Unauthorized)
-    ```
+}
+```
+Success:
+``` http
+Status: 200 (OK)
+Set-Cookie: sessionid=...
+```
+Wrong credentials:
+``` http
+Status: 401 (Unauthorized)
+```
 
 ### Logout
 Logs out the currently logged in user.
-- __Request__:
-  ``` http
-  POST /api/logout/
-  Cookie: sessionid=...
-  ```
-- __Response__:
-    ``` http
-    Status: 200 (OK)
-    ```
+
+Request:
+``` http
+POST /api/logout/
+Cookie: sessionid=...
+```
+Success response:
+``` http
+Status: 200 (OK)
+```
 
 ### Check
 Checks if the user is logged in or not.
-- __Request__:
-  ``` http
-  GET /api/check/
-  Cookie: sessionid=...
-  ```
-- __Response__:\
-    If logged in:
-    ``` http
-    Status: 200 (OK)
-    ```
-    If not logged in:
-    ``` http
-    Status: 401 (Unauthorized)
-    ```
+
+Request:
+``` http
+GET /api/check/
+Cookie: sessionid=...
+```
+Response if logged in:
+``` http
+Status: 200 (OK)
+```
+Response if not logged in:
+``` http
+Status: 401 (Unauthorized)
+```
 
 ## Cases
 ### Get cases
-Gets all cases.
-- __Request__:
-    ``` http
-    GET /api/cases/
-    ```
-    Query parameters:
-    - (Not jet implemented)
+Returns all cases sorted chronologically that matches the given query parameters.
 
-- __Response__:
-    ``` http
-    Status: 200 (OK)
-    ```
-    ``` json
-    [
-        {
-            "id": 1,
-            "notes": "Example notes 1",
-            "medium": "phone",
-            "created_at": "yyyy-mm-ddThh:mm:ssZ",
-            "updated_at": "yyyy-mm-ddThh:mm:ssZ",
-            ...
-        },
-        {
-            "id": 2,
-            "notes": "Example notes 2",
-            "medium": "email",
-            "created_at": "yyyy-mm-ddThh:mm:ssZ",
-            "updated_at": "yyyy-mm-ddThh:mm:ssZ",
-            ...
-        },
-        ...
-    ]
-    ```
+Query parameters:
+- `id: int` (Not jet implemented)
+- `index-start: int` (Not jet implemented)
+- `index-end: int` (Not jet implemented)
+- `category_id: int` (Not jet implemented)
+
+Request:
+``` http
+GET /api/cases/
+```
+
+Success response:
+``` http
+Status: 200 (OK)
+
+[
+    {
+        "id": 1,
+        "notes": "Example notes 1",
+        "medium": "phone",
+        "created_at": "yyyy-mm-ddThh:mm:ssZ",
+        "updated_at": "yyyy-mm-ddThh:mm:ssZ",
+    },
+    {
+        "id": 2,
+        "notes": "Example notes 2",
+        "medium": "email",
+        "created_at": "yyyy-mm-ddThh:mm:ssZ",
+        "updated_at": "yyyy-mm-ddThh:mm:ssZ",
+    },
+]
+```
 
 ### Create case
 Creates a new case.
-Fields that are not specified will be set to default values.
-- __Request__:
-    ``` http
-    POST /api/cases/
-    ```
-    ``` json
-    {
-        "notes": "Example notes 1",
-        "medium": "phone",
-        ...
-    }
-    ```
-- __Response__:
-    ``` http
-    Status: 201 (Created)
-    ```
+All fields are optional and will be set to empty values if not specified.
+
+Request:
+``` http
+POST /api/cases/
+
+{
+    "notes": "Example notes 1",
+    "medium": "phone",
+}
+```
+Success response:
+``` http
+Status: 201 (Created)
+```
 
 ### Update case
 Updates the case with the given id.
 Fields that are not specified will not be updated.
-- __Request__:
-    ``` http
-    PATCH /api/cases/<id>/
-    ```
-    ``` json
-    {
-        "notes": "Example notes 1",
-        "medium": "phone",
-        ...
-    }
-    ```
-- __Response__:
-    ``` http
-    Status: 204 (No Content)
-    ```
+If a filed is specified but with an empty value it will be set to an empty value.
+
+Request:
+``` http
+PATCH /api/cases/<id>/
+
+{
+    "notes": "Example notes 1",
+    "medium": "phone",
+}
+```
+Success response:
+``` http
+Status: 204 (No Content)
+```
+
+### Delete case
+Deletes the case with the given id.
+
+Request:
+``` http
+DELETE /api/cases/<id>/
+```
+
+Success response:
+``` http
+Status: 204 (No Content)
+```
+
+### Get categories
+Returns all categories.
+
+Request:
+``` http
+GET /api/categories/
+```
+
+Success response:
+``` http
+Status: 200 (OK)
+
+(The response format is not yet finalized)
+```
