@@ -82,6 +82,14 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
         return HttpResponse(status=204)
 
     elif request.method == "DELETE":
+        try:
+            json_string = request.body.decode()
+            dictionary = json.loads(json_string)
+            cases.delete_case(id, dictionary)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError):
+            return HttpResponse(status=400)
+        except Case.DoesNotExist:
+            return HttpResponse(status=404)
         return HttpResponse(status=204)
 
 
