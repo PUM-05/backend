@@ -85,7 +85,7 @@ python3 src/manage.py runserver
 ### Login
 Logs in the user with the given credentials.
 The password field is not required, since some users may not have a password.
-An empty password filed will be treaded the same as if no password field was given.
+An empty password field will be treaded the same as if no password field was given.
 
 Request:
 ``` http
