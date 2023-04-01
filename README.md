@@ -2,9 +2,23 @@
 ![](https://github.com/PUM-05/backend/actions/workflows/style.yml/badge.svg)
 ![](https://github.com/PUM-05/backend/actions/workflows/sonar.yml/badge.svg)
 
-
-# Backend readme
-Contains instructions for setting up and running the backend part of the Personalkollen project.
+__Table of Contents__
+- [Setup](#setup)
+  * [Requirements](#requirements)
+  * [Backend setup](#backend-setup)
+  * [Deploy static files from frontend](#deploy-static-files-from-frontend)
+  * [Starting the server](#starting-the-server)
+- [API](#api)
+  * [Authentication](#authentication)
+    + [Login](#login)
+    + [Logout](#logout)
+    + [Check](#check)
+  * [Cases](#cases)
+    + [Get cases](#get-cases)
+    + [Create case](#create-case)
+    + [Update case](#update-case)
+    + [Delete case](#delete-case)
+    + [Get categories](#get-categories)
 
 # Setup
 
