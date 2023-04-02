@@ -164,7 +164,7 @@ Status: 401 (Unauthorized)
 
 ## Cases
 ### Get cases
-Returns all cases sorted chronologically that matches the given query parameters.
+Returns a list with all cases sorted chronologically that matches the given query parameters.
 
 Query parameters:
 - `id: int` (Not jet implemented)
@@ -186,15 +186,12 @@ Status: 200 (OK)
         "id": 1,
         "notes": "Example notes 1",
         "medium": "phone",
+        "customer_time": "PdDThhHmmMssS",
+        "additional_time": "PdDThhHmmMssS",
+        "form_fill_time": "PdDThhHmmMssS",
         "created_at": "yyyy-mm-ddThh:mm:ssZ",
         "updated_at": "yyyy-mm-ddThh:mm:ssZ",
-    },
-    {
-        "id": 2,
-        "notes": "Example notes 2",
-        "medium": "email",
-        "created_at": "yyyy-mm-ddThh:mm:ssZ",
-        "updated_at": "yyyy-mm-ddThh:mm:ssZ",
+        "category_id": 1,
     },
 ]
 ```
@@ -220,7 +217,7 @@ Status: 201 (Created)
 ### Update case
 Updates the case with the given id.
 Fields that are not specified will not be updated.
-If a filed is specified but with an empty value it will be set to an empty value.
+If a field is specified but with an empty value it will be set to an empty value.
 
 Request:
 ``` http
