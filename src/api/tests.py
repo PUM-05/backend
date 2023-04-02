@@ -151,7 +151,7 @@ class APITests(TestCase):
 
     def test_delete_case_correct_id(self) -> None:
         """
-        Tests that the check endpoint returns a 200 status code when a case is found
+        Tests that the check endpoint returns a 204 status code when a case is found
         and deleted, as well as if the number of cases have changed and if querying a
         deleted object will result in an error.
         """
