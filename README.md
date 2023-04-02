@@ -207,6 +207,10 @@ POST /api/cases/
 {
     "notes": "Example notes 1",
     "medium": "phone",
+    "customer_time": seconds,
+    "additional_time": seconds,
+    "form_fill_time": seconds,
+    "category_id": 1,
 }
 ```
 Success response:
@@ -226,6 +230,10 @@ PATCH /api/cases/<id>/
 {
     "notes": "Example notes 1",
     "medium": "phone",
+    "customer_time": seconds,
+    "additional_time": seconds,
+    "form_fill_time": seconds,
+    "category_id": 1,
 }
 ```
 Success response:
