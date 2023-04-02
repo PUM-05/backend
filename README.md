@@ -52,7 +52,7 @@ python -m venv .venv
 Set-ExecutionPolicy -ExecutionPolicy AllSigned
 ```
 
-Activate the environment:
+- Activate the environment:
 ```
 .venv\Scripts\activate
 ```
