@@ -62,3 +62,11 @@ def get_case_categories() -> List[Dict]:
     Returns all case categories.
     """
     return list(Category.objects.all().values())
+
+
+def delete_case(case_id: int) -> None:
+    """
+    Deletes a case with the given id.
+    """
+    case = Case.objects.get(id=case_id)
+    case.delete()

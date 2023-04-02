@@ -4,6 +4,8 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
 
+from api.models import Case
+
 from .interfaces import cases, auth
 
 
@@ -82,6 +84,10 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
         return HttpResponse(status=204)
 
     elif request.method == "DELETE":
+        try:
+            cases.delete_case(id)
+        except Case.DoesNotExist:
+            return HttpResponse(status=404)
         return HttpResponse(status=204)
 
 

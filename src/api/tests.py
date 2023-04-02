@@ -148,3 +148,40 @@ class APITests(TestCase):
         self.assertEqual(data[6]["parent_id"], 5)
         self.assertEqual(data[5]["parent_id"], 5)
         self.assertEqual(data[7]["parent_id"], 6)
+
+    def test_delete_case_correct_id(self) -> None:
+        """
+        Tests that the check endpoint returns a 204 status code when a case is found
+        and deleted, as well as if the number of cases have changed and if querying a
+        deleted object will result in an error.
+        """
+        no_cases_before = len(Case.objects.all())
+
+        response = self.client.delete(CASE_PATH + "/1", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 204)
+
+        no_cases_after = len(Case.objects.all())
+        self.assertNotEqual(no_cases_before, no_cases_after)
+
+        response = self.client.delete(CASE_PATH + "/2", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 204)
+        with self.assertRaises(Case.DoesNotExist):
+            Case.objects.get(id=2)
+
+    def test_delete_case_incorrect_id(self) -> None:
+        """
+        Tests that the check endpoint returns a 404 status code when a case is queried
+        with an incorrect id when trying to make a delete request, as well as if the
+        number of cases remain the same.
+        """
+        no_cases_before = len(Case.objects.all())
+
+        response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete(CASE_PATH + "/anders", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 404)
+        response = self.client.delete(CASE_PATH + "/", content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 404)
+
+        no_cases_after = len(Case.objects.all())
+        self.assertEqual(no_cases_before, no_cases_after)
