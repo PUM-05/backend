@@ -124,7 +124,7 @@ POST /api/login/
 ```
 Success:
 ``` http
-Status: 200 (OK)
+Status: 204 (No Content)
 Set-Cookie: sessionid=...
 ```
 The username was valid, but a password is also required and wasn't provided in the request: (Not yet implemented)
@@ -146,7 +146,7 @@ Cookie: sessionid=...
 ```
 Success response:
 ``` http
-Status: 200 (OK)
+Status: 204 (No Content)
 ```
 
 ### Check
@@ -159,7 +159,7 @@ Cookie: sessionid=...
 ```
 Response if logged in:
 ``` http
-Status: 200 (OK)
+Status: 204 (No Content)
 ```
 Response if not logged in:
 ``` http

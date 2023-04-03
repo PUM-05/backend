@@ -88,10 +88,10 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
             cases.update_case(id, dictionary)
-        except (JSONDecodeError, UnicodeDecodeError, ValueError):
-            return HttpResponse(status=400)
-        except Case.DoesNotExist:
-            return HttpResponse(status=404)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+            return HttpResponse(status=400, content=str(error))
+        except Case.DoesNotExist as error:
+            return HttpResponse(status=404, content=str(error))
 
         return HttpResponse(status=204)
 
