@@ -136,6 +136,16 @@ class APITests(TestCase):
         self.assertEqual(data[1]["medium"], "phone")
         self.assertEqual(data[2]["medium"], "email")
 
+    def test_patch_case(self) -> None:
+        dictionary = {"notes": "new notes"}
+
+        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(Case.objects.get(id=1).notes, "new notes")
+
+        response = self.client.patch(CASE_PATH + "/99", dictionary, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 404)
+
     def test_nested_categories(self) -> None:
         response = self.client.get("/api/case/categories")
         self.assertEqual(response.status_code, 200)

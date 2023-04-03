@@ -30,22 +30,54 @@ def create_case(dictionary: Dict) -> None:
     Creates a new case and adds it to the database. Raises ValueError if
     the data is incorrect.
     """
-    if not validate_case:
+    if not validate_case(dictionary):
         raise ValueError
 
     case = Case()
 
-    case.notes = dictionary.get("notes")
-    case.customer_time = timedelta(seconds=dictionary.get("customer_time") or 0)
-    case.additional_time = timedelta(seconds=dictionary.get("additional_time") or 0)
-    case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time") or 0)
+    fill_case(case, dictionary)
 
-    medium = dictionary.get("medium")
-    if "medium" in dictionary and (medium != "phone" and medium != "email"):
+    case.save()
+
+
+def update_case(case_id: int, dictionary: Dict) -> None:
+    """
+    Updates a case with a given id.
+    Raises Case.DoesNotExist if wrong case_id,
+    and ValueError if the dictionary contains bad data.
+    """
+    if not validate_case(dictionary):
         raise ValueError
 
-    else:
-        case.medium = medium
+    case = Case.objects.get(id=case_id)
+
+    fill_case(case, dictionary)
+    case.save()
+
+
+def fill_case(case: Case, dictionary: Dict) -> None:
+    """
+    Updates a given case with properties from a given dictionary.
+    Raises ValueError if dictionary values are not valid.
+    """
+    if "notes" in dictionary:
+        case.notes = dictionary.get("notes")
+
+    if "customer_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary.get("customer_time") or 0)
+
+    if "additional_time" in dictionary:
+        case.additional_time = timedelta(seconds=dictionary.get("additional_time") or 0)
+
+    if "form_fill_time" in dictionary:
+        case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time") or 0)
+
+    if "medium" in dictionary:
+        medium = dictionary.get("medium")
+        if medium == "phone" or medium == "email":
+            case.medium = medium
+        else:
+            raise ValueError
 
     if "category_id" in dictionary:
         try:
@@ -54,7 +86,6 @@ def create_case(dictionary: Dict) -> None:
             raise ValueError
 
         case.category = category
-    case.save()
 
 
 def get_case_categories() -> List[Dict]:
