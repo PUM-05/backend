@@ -110,7 +110,7 @@ python3 src/manage.py runserver
 ## Authentication
 ### Login
 Logs in the user with the given credentials.
-The password field is not required, since some users may not have a password.
+The password field is not always required, since some users may not have a password.
 An empty password field will be treaded the same as if no password field was given.
 
 Request:
@@ -127,7 +127,11 @@ Success:
 Status: 200 (OK)
 Set-Cookie: sessionid=...
 ```
-Wrong credentials:
+The username was valid, but a password is also required and wasn't provided in the request: (Not yet implemented)
+``` http
+Status: 403 (Forbidden)
+```
+Wrong username or password:
 ``` http
 Status: 401 (Unauthorized)
 ```
@@ -207,9 +211,9 @@ POST /api/cases/
 {
     "notes": "Example notes 1",
     "medium": "phone",
-    "customer_time": seconds,
-    "additional_time": seconds,
-    "form_fill_time": seconds,
+    "customer_time": 0,
+    "additional_time": 0,
+    "form_fill_time": 0,
     "category_id": 1,
 }
 ```
@@ -230,9 +234,9 @@ PATCH /api/cases/<id>/
 {
     "notes": "Example notes 1",
     "medium": "phone",
-    "customer_time": seconds,
-    "additional_time": seconds,
-    "form_fill_time": seconds,
+    "customer_time": 0,
+    "additional_time": 0,
+    "form_fill_time": 0,
     "category_id": 1,
 }
 ```
