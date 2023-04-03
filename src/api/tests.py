@@ -60,6 +60,9 @@ class APITests(TestCase):
         response = self.client.post("/api/login", {"username": "wrong"})
         self.assertEqual(response.status_code, 401)
 
+        response = self.client.post("/api/login")
+        self.assertEqual(response.status_code, 400)
+
     def test_logout(self) -> None:
         """
         Tests that the logout endpoint returns a 204 status code when the user
@@ -146,6 +149,13 @@ class APITests(TestCase):
         response = self.client.patch(CASE_PATH + "/99", dictionary, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
 
+        dictionary = {"medium": "wrong"}
+        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 400)
+        dictionary = {"wrong": "medium"}
+        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 400)
+
     def test_nested_categories(self) -> None:
         response = self.client.get("/api/case/categories")
         self.assertEqual(response.status_code, 200)
@@ -171,7 +181,7 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
         no_cases_after = len(Case.objects.all())
-        self.assertNotEqual(no_cases_before, no_cases_after)
+        self.assertEqual(no_cases_before, no_cases_after+1)
 
         response = self.client.delete(CASE_PATH + "/2", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
