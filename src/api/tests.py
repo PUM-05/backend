@@ -38,7 +38,8 @@ class APITests(TestCase):
         Tests that the login endpoint returns a 204 status code and a session
         cookie when the login is successful.
         """
-        response = self.client.post("/api/login", {"username": "user1"}, content_type=CONTENT_TYPE_JSON)
+        response = self.client.post("/api/login", {"username": "user1"},
+                                    content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertTrue(len(response.cookies["sessionid"].value) > 0)
 
@@ -56,10 +57,12 @@ class APITests(TestCase):
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
-        response = self.client.post("/api/login", {"username": "user2"}, content_type=CONTENT_TYPE_JSON)
+        response = self.client.post("/api/login", {"username": "user2"},
+                                    content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 403)
 
-        response = self.client.post("/api/login", {"username": "wrong"}, content_type=CONTENT_TYPE_JSON)
+        response = self.client.post("/api/login", {"username": "wrong"},
+                                    content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
         response = self.client.post("/api/login")
