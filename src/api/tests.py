@@ -38,11 +38,12 @@ class APITests(TestCase):
         Tests that the login endpoint returns a 204 status code and a session
         cookie when the login is successful.
         """
-        response = self.client.post("/api/login", {"username": "user1"})
+        response = self.client.post("/api/login", {"username": "user1"}, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertTrue(len(response.cookies["sessionid"].value) > 0)
 
-        response = self.client.post("/api/login", {"username": "user2", "password": "password2"})
+        response = self.client.post("/api/login", {"username": "user2", "password": "password2"},
+                                    content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertTrue(len(response.cookies["sessionid"].value) > 0)
 
@@ -51,13 +52,14 @@ class APITests(TestCase):
         Tests that the login endpoint returns a 401 status code when the login
         is unsuccessful.
         """
-        response = self.client.post("/api/login", {"username": "user1", "password": "wrong"})
+        response = self.client.post("/api/login", {"username": "user1", "password": "wrong"},
+                                    content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
-        response = self.client.post("/api/login", {"username": "user2"})
-        self.assertEqual(response.status_code, 401)
+        response = self.client.post("/api/login", {"username": "user2"}, content_type=CONTENT_TYPE_JSON)
+        self.assertEqual(response.status_code, 403)
 
-        response = self.client.post("/api/login", {"username": "wrong"})
+        response = self.client.post("/api/login", {"username": "wrong"}, content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
         response = self.client.post("/api/login")
