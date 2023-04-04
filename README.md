@@ -52,7 +52,7 @@ python3 src/manage.py migrate
 python3 src/manage.py test api
 ```
 
-- Create a super user (Follow the instructions in the command. The email is not required):
+- Create a super user, and make sure to follow the instructions in the command line (the email is not required):
 ```
 python3 src/manage.py createsuperuser
 ```
