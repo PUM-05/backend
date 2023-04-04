@@ -93,7 +93,7 @@ python src\manage.py test api
 
 - Create a super user, and make sure to follow the instructions in the command line (the email is not required):
 ```
-python3 src/manage.py createsuperuser
+python src\manage.py createsuperuser
 ```
 
 ## Deploy static files from frontend
