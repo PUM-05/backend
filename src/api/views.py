@@ -15,13 +15,14 @@ def login(request: HttpRequest) -> HttpResponse:
     """
     try:
         success = auth.login_user(request)
-    except ValueError:
-        return HttpResponse(status=400)
+    except ValueError as error:
+        return HttpResponse(status=400, content=str(error))
 
     if success:
-        return HttpResponse(status=200)
+        return HttpResponse(status=204)
     else:
-        return HttpResponse(status=401)
+        error_msg = "Wrong username or password."
+        return HttpResponse(status=401, content=error_msg)
 
 
 def logout(request: HttpRequest) -> HttpResponse:
@@ -30,9 +31,10 @@ def logout(request: HttpRequest) -> HttpResponse:
     """
     if request.user.is_authenticated:
         auth.logout_user(request)
-        return HttpResponse(status=200)
+        return HttpResponse(status=204)
     else:
-        return HttpResponse(status=401)
+        error_msg = "User is already logged out."
+        return HttpResponse(status=401, content=error_msg)
 
 
 def check(request: HttpRequest) -> HttpResponse:
@@ -40,9 +42,10 @@ def check(request: HttpRequest) -> HttpResponse:
     Checks if the user is logged in.
     """
     if request.user.is_authenticated:
-        return HttpResponse(status=200)
+        return HttpResponse(status=204)
     else:
-        return HttpResponse(status=401)
+        error_msg = "User is not logged in."
+        return HttpResponse(status=401, content=error_msg)
 
 
 @require_http_methods({"GET", "POST"})
@@ -56,8 +59,8 @@ def case(request: HttpRequest) -> HttpResponse:
 
         try:
             matching_cases = cases.get_cases(params)
-        except ValueError:
-            return HttpResponse(status=400)
+        except ValueError as error:
+            return HttpResponse(status=400, content=str(error))
 
         cases_json = json.dumps(matching_cases, cls=DjangoJSONEncoder)
         return HttpResponse(cases_json, content_type="application/json", status=200)
@@ -68,8 +71,8 @@ def case(request: HttpRequest) -> HttpResponse:
             dictionary = json.loads(json_string)
             cases.create_case(dictionary)
 
-        except (JSONDecodeError, UnicodeDecodeError, ValueError):
-            return HttpResponse(status=400)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+            return HttpResponse(status=400, content=str(error))
 
         return HttpResponse(status=201)
 
@@ -85,18 +88,18 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
             cases.update_case(id, dictionary)
-        except (JSONDecodeError, UnicodeDecodeError, ValueError):
-            return HttpResponse(status=400)
-        except Case.DoesNotExist:
-            return HttpResponse(status=404)
+        except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+            return HttpResponse(status=400, content=str(error))
+        except Case.DoesNotExist as error:
+            return HttpResponse(status=404, content=str(error))
 
         return HttpResponse(status=204)
 
     elif request.method == "DELETE":
         try:
             cases.delete_case(id)
-        except Case.DoesNotExist:
-            return HttpResponse(status=404)
+        except Case.DoesNotExist as error:
+            return HttpResponse(status=404, content=str(error))
         return HttpResponse(status=204)
 
 

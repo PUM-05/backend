@@ -12,7 +12,7 @@ def login_user(request: HttpRequest) -> bool:
     if "username" in request.POST:
         username = request.POST['username']
     else:
-        raise ValueError("Missing username")
+        raise ValueError("Missing username.")
 
     if "password" in request.POST:
         password = request.POST['password']

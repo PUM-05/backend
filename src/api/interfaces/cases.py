@@ -12,17 +12,16 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     return list(Case.objects.all().values())
 
 
-def validate_case(dictionary: Dict) -> bool:
+def validate_case(dictionary: Dict) -> None:
     """
-    Returns true if all keys in the given dictionary are valid,
-    false otherwise.
+    Throws ValueError if any key in the given dictionary is invalid,
+    otherwise returns None.
     """
     list_of_keys = {"notes", "medium", "customer_time",
                     "additional_time", "form_fill_time", "category_id"}
     for key in dictionary.keys():
         if key not in list_of_keys:
-            return False
-    return True
+            raise ValueError(f"Unexpected key: {key}.")
 
 
 def create_case(dictionary: Dict) -> None:
@@ -30,13 +29,11 @@ def create_case(dictionary: Dict) -> None:
     Creates a new case and adds it to the database. Raises ValueError if
     the data is incorrect.
     """
-    if not validate_case(dictionary):
-        raise ValueError
+    validate_case(dictionary)
 
     case = Case()
 
     fill_case(case, dictionary)
-
     case.save()
 
 
@@ -46,8 +43,7 @@ def update_case(case_id: int, dictionary: Dict) -> None:
     Raises Case.DoesNotExist if wrong case_id,
     and ValueError if the dictionary contains bad data.
     """
-    if not validate_case(dictionary):
-        raise ValueError
+    validate_case(dictionary)
 
     case = Case.objects.get(id=case_id)
 
@@ -77,13 +73,13 @@ def fill_case(case: Case, dictionary: Dict) -> None:
         if medium == "phone" or medium == "email":
             case.medium = medium
         else:
-            raise ValueError
+            raise ValueError(f"Invalid medium: {medium}.")
 
     if "category_id" in dictionary:
         try:
             category = Category.objects.get(id=dictionary.get("category_id"))
         except Category.DoesNotExist:
-            raise ValueError
+            raise ValueError(f"Category with id {dictionary.get('category_id')} does not exist.")
 
         case.category = category
 
