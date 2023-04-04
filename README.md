@@ -178,7 +178,7 @@ Query parameters:
 
 Request:
 ``` http
-GET /api/cases/
+GET /api/case/
 ```
 
 Success response:
@@ -206,7 +206,7 @@ All fields are optional and will be set to empty values if not specified.
 
 Request:
 ``` http
-POST /api/cases/
+POST /api/case/
 
 {
     "notes": "Example notes 1",
@@ -229,7 +229,7 @@ If a field is specified but with an empty value it will be set to an empty value
 
 Request:
 ``` http
-PATCH /api/cases/<id>/
+PATCH /api/case/<id>/
 
 {
     "notes": "Example notes 1",
@@ -250,7 +250,7 @@ Deletes the case with the given id.
 
 Request:
 ``` http
-DELETE /api/cases/<id>/
+DELETE /api/case/<id>/
 ```
 
 Success response:
