@@ -84,6 +84,7 @@ def fill_case(case: Case, dictionary: Dict) -> None:
         case.category = category
 
 
+
 def get_case_categories() -> List[Dict]:
     """
     Returns all case categories.
@@ -92,18 +93,21 @@ def get_case_categories() -> List[Dict]:
     indexes = {}
     i = 0
     flat_categories = list(Category.objects.all().values())
-    print(flat_categories)
     for category in flat_categories:
         if not category["parent_id"]:
             categories.append(
-                {"id": category["id"], "name": category["name"], "children": []}
+                {"id": category["id"], "name": category["name"], "subcategories": []}
             )
             indexes[category["id"]] = i
             i += 1
         else:
-            categories[indexes[category["parent_id"]]]["children"].append(
-                {"id": category["id"], "name": category["name"], "children": []}
+            categories[indexes[category["parent_id"]]]["subcategories"].append(
+                {"id": category["id"], "name": category["name"]}
             )
+
+    for bro in categories:
+        print(bro)
+
     return categories
 
 
