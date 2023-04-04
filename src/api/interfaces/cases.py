@@ -84,7 +84,6 @@ def fill_case(case: Case, dictionary: Dict) -> None:
         case.category = category
 
 
-
 def get_case_categories() -> List[Dict]:
     """
     Returns all case categories.
@@ -104,9 +103,6 @@ def get_case_categories() -> List[Dict]:
             categories[indexes[category["parent_id"]]]["subcategories"].append(
                 {"id": category["id"], "name": category["name"]}
             )
-
-    for bro in categories:
-        print(bro)
 
     return categories
 
