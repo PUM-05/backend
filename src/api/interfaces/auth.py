@@ -38,7 +38,7 @@ def login_user(request: HttpRequest) -> bool:
     else:
         if not password:
             if User.objects.filter(username=username).exists():
-                raise PasswordNeededError("Password required")
+                raise PasswordNeededError("Password required.")
         return False
 
 

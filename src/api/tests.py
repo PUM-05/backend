@@ -16,9 +16,8 @@ class APITests(TestCase):
         Category.objects.create(name="test3")
         Category.objects.create(name="test4")
         p = Category.objects.create(name="test5")
-        p2 = Category.objects.create(name="test51", parent=p)
+        Category.objects.create(name="test51", parent=p)
         Category.objects.create(name="test52", parent=p)
-        Category.objects.create(name="test511", parent=p2)
 
         Case.objects.create()
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
@@ -167,12 +166,19 @@ class APITests(TestCase):
 
         content = response.content.decode()
         data = json.loads(content)
+        count = 0
+        for category in data:
+            count += 1
+            self.assertIsNotNone(category["id"])
+            self.assertIsNotNone(category["name"])
 
-        self.assertEqual(len(data), 8)
-        self.assertEqual(data[3]["parent_id"], None)
-        self.assertEqual(data[6]["parent_id"], 5)
-        self.assertEqual(data[5]["parent_id"], 5)
-        self.assertEqual(data[7]["parent_id"], 6)
+            for subcategory in category["subcategories"]:
+                count += 1
+                self.assertIsNotNone(subcategory["id"])
+                self.assertIsNotNone(subcategory["name"])
+                self.assertFalse("subcategories" in subcategory)
+
+        self.assertEqual(count, 7)
 
     def test_delete_case_correct_id(self) -> None:
         """

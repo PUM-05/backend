@@ -270,5 +270,19 @@ Success response:
 ``` http
 Status: 200 (OK)
 
-(The response format is not yet finalized)
+[
+    {
+        "id": 1,
+        "name": "Konto",
+        "subcategories": [
+            {"id": 2, "name": "Skapa nytt konto"},
+            {"id": 3, "name": "Ta bort konto"}
+        ]
+    }, 
+    {  
+        "id": 4,
+        "name": "Annat",
+        "subcategories": []
+    }
+]
 ```
