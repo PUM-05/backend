@@ -1,5 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User
 from django.http import HttpRequest
+import json
+
+
+class PasswordNeededError(Exception):
+    pass
 
 
 def login_user(request: HttpRequest) -> bool:
@@ -9,13 +15,17 @@ def login_user(request: HttpRequest) -> bool:
 
     Returns True if the login was successful, otherwise False.
     """
-    if "username" in request.POST:
-        username = request.POST['username']
+
+    json_string = request.body.decode()
+    dictionary = json.loads(json_string)
+
+    if "username" in dictionary:
+        username = dictionary['username']
     else:
         raise ValueError("Missing username.")
 
-    if "password" in request.POST:
-        password = request.POST['password']
+    if "password" in dictionary:
+        password = dictionary['password']
     else:
         # Use an empty password if none is provided
         password = ""
@@ -26,6 +36,9 @@ def login_user(request: HttpRequest) -> bool:
         login(request, user)
         return True
     else:
+        if not password:
+            if User.objects.filter(username=username).exists():
+                raise PasswordNeededError("Password required")
         return False
 
 

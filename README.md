@@ -127,7 +127,7 @@ Success:
 Status: 204 (No Content)
 Set-Cookie: sessionid=...
 ```
-The username was valid, but a password is also required and wasn't provided in the request: (Not yet implemented)
+The username was valid, but a password is also required and wasn't provided in the request:
 ``` http
 Status: 403 (Forbidden)
 ```

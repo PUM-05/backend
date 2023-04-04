@@ -17,6 +17,8 @@ def login(request: HttpRequest) -> HttpResponse:
         success = auth.login_user(request)
     except ValueError as error:
         return HttpResponse(status=400, content=str(error))
+    except auth.PasswordNeededError as error:
+        return HttpResponse(status=403, content=str(error))
 
     if success:
         return HttpResponse(status=204)
