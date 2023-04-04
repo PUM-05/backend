@@ -88,7 +88,23 @@ def get_case_categories() -> List[Dict]:
     """
     Returns all case categories.
     """
-    return list(Category.objects.all().values())
+    categories = []
+    indexes = {}
+    i = 0
+    flat_categories = list(Category.objects.all().values())
+    print(flat_categories)
+    for category in flat_categories:
+        if not category["parent_id"]:
+            categories.append(
+                {"id": category["id"], "name": category["name"], "children": []}
+            )
+            indexes[category["id"]] = i
+            i += 1
+        else:
+            categories[indexes[category["parent_id"]]]["children"].append(
+                {"id": category["id"], "name": category["name"], "children": []}
+            )
+    return categories
 
 
 def delete_case(case_id: int) -> None:

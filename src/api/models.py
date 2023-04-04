@@ -24,7 +24,7 @@ class Category(models.Model):
         super(Category, self).save(*args, **kwargs)
 
     class Meta:
-        ordering = ['id', 'level']
+        ordering = ['level']
         verbose_name_plural = "categories"
 
 
