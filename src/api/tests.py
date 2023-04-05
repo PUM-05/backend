@@ -105,9 +105,9 @@ class APITests(TestCase):
             category = (i % 5) + 1
             created_by = (i % 2) + 1
 
-            dictionary = {"created_by": created_by, "notes": notes, "medium": medium, "customer_time": customer_time,
-                          "form_fill_time": form_fill_time, "additional_time": additional_time,
-                          "category_id": category}
+            dictionary = {"created_by": created_by, "notes": notes, "medium": medium,
+                          "customer_time": customer_time, "form_fill_time": form_fill_time,
+                          "additional_time": additional_time, "category_id": category}
 
             response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
