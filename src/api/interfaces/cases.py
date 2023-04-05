@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
 
-from api.models import Category, Case
+from api.models import Category, Case, User
 
 
 def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
@@ -17,7 +17,7 @@ def validate_case(dictionary: Dict) -> None:
     Throws ValueError if any key in the given dictionary is invalid,
     otherwise returns None.
     """
-    list_of_keys = {"notes", "medium", "customer_time",
+    list_of_keys = {"created_by", "notes", "medium", "customer_time",
                     "additional_time", "form_fill_time", "category_id"}
     for key in dictionary.keys():
         if key not in list_of_keys:
@@ -82,6 +82,12 @@ def fill_case(case: Case, dictionary: Dict) -> None:
             raise ValueError(f"Category with id {dictionary.get('category_id')} does not exist.")
 
         case.category = category
+
+    if "created_by" in dictionary:
+        try:
+            user = User.objects.get(id=dictionary.get("created_by"))
+        except User.DoesNotExist:
+            raise ValueError(f"User with id {dictionary.get('created_by')} does not exist.")
 
 
 def get_case_categories() -> List[Dict]:

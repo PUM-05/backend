@@ -103,14 +103,27 @@ class APITests(TestCase):
             form_fill_time = i
             additional_time = i + 1
             category = (i % 5) + 1
+            created_by = (i % 2) + 1
 
-            dictionary = {"notes": notes, "medium": medium, "customer_time": customer_time,
+            dictionary = {"created_by": created_by, "notes": notes, "medium": medium, "customer_time": customer_time,
                           "form_fill_time": form_fill_time, "additional_time": additional_time,
                           "category_id": category}
 
             response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
             self.assertEqual(response.status_code, 201)
+
+    def test_create_case_incorrect_created_by(self) -> None:
+        category = 5
+        notes = "notes"
+        medium = "email"
+        created_by = 999
+        dictionary = {"created_by": created_by, "notes": notes,
+                      "medium": medium, "category_id": category}
+
+        response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
+
+        self.assertEqual(response.status_code, 400)
 
     def test_create_case_incorrect_category(self) -> None:
         category = 945
