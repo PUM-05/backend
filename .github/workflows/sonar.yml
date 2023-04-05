@@ -20,7 +20,7 @@ jobs:
           pip install -r ./requirements/dev.txt
       - name: Run tests with coverage
         run: |
-          coverage run src/manage.py test backend api
+          coverage run --branch src/manage.py test backend api
           coverage xml
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
