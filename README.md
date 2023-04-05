@@ -52,6 +52,11 @@ python3 src/manage.py migrate
 python3 src/manage.py test api
 ```
 
+- Create a super user, and make sure to follow the instructions in the command line (the email is not required):
+```
+python3 src/manage.py createsuperuser
+```
+
 ## Backend Setup (Windows 10/11)
 
 - Git clone the repository to your local machine.
@@ -84,6 +89,11 @@ python src\manage.py migrate
 - Run tests to make sure it works correctly (no errors should occur):
 ```
 python src\manage.py test api
+```
+
+- Create a super user, and make sure to follow the instructions in the command line (the email is not required):
+```
+python src\manage.py createsuperuser
 ```
 
 ## Deploy static files from frontend
