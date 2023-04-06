@@ -96,6 +96,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
+
+        # Login required to create cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         for i in range(10):
             notes = "notes" + str(i)
             medium = "email" if i % 2 else "phone"
@@ -113,6 +118,11 @@ class APITests(TestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_create_case_incorrect_category(self) -> None:
+
+        # Login required to create cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         category = 945
         notes = "notes"
         medium = "email"
@@ -123,6 +133,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_create_case_incorrect_medium(self) -> None:
+
+        # Login required to create cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         category = 5
         notes = "notes"
         medium = "tiktok"
@@ -133,6 +148,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_case_without_parameters(self) -> None:
+
+        # Login required to create cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         response = self.client.get(CASE_PATH)
         content = response.content.decode()
         data = json.loads(content)
@@ -144,6 +164,11 @@ class APITests(TestCase):
         self.assertEqual(data[2]["medium"], "email")
 
     def test_patch_case(self) -> None:
+
+        # Login required to edit cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         dictionary = {"notes": "new notes"}
 
         response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
@@ -186,6 +211,11 @@ class APITests(TestCase):
         and deleted, as well as if the number of cases have changed and if querying a
         deleted object will result in an error.
         """
+
+        # Login required to delete cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/1", content_type=CONTENT_TYPE_JSON)
@@ -205,6 +235,11 @@ class APITests(TestCase):
         with an incorrect id when trying to make a delete request, as well as if the
         number of cases remain the same.
         """
+
+        # Login required to delete cases
+        self.client.login(username="user1", password="")
+        self.client.login(username="user2", password="password2")
+
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)

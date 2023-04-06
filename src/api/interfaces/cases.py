@@ -24,10 +24,10 @@ def validate_case(dictionary: Dict) -> None:
             raise ValueError(f"Unexpected key: {key}.")
 
 
-def create_case(dictionary: Dict) -> None:
+def create_case(dictionary: Dict) -> Case:
     """
     Creates a new case and adds it to the database. Raises ValueError if
-    the data is incorrect.
+    the data is incorrect. Returns the new case.
     """
     validate_case(dictionary)
 
@@ -35,13 +35,13 @@ def create_case(dictionary: Dict) -> None:
 
     fill_case(case, dictionary)
     case.save()
+    return case
 
 
-def update_case(case_id: int, dictionary: Dict) -> None:
+def update_case(case_id: int, dictionary: Dict) -> Case:
     """
-    Updates a case with a given id.
-    Raises Case.DoesNotExist if wrong case_id,
-    and ValueError if the dictionary contains bad data.
+    Updates a case with a given id. Raises Case.DoesNotExist if wrong case_id,
+    and ValueError if the dictionary contains bad data. Returns the edited case.
     """
     validate_case(dictionary)
 
@@ -49,6 +49,7 @@ def update_case(case_id: int, dictionary: Dict) -> None:
 
     fill_case(case, dictionary)
     case.save()
+    return case
 
 
 def fill_case(case: Case, dictionary: Dict) -> None:

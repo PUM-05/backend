@@ -46,4 +46,8 @@ class Case(models.Model):
         Category, on_delete=models.SET_NULL, null=True)
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, null=True)
-    user = models.ManyToManyField(User)
+
+    created_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, related_name="created_cases")
+    edited_by = models.ManyToManyField(
+        User, related_name="edited_cases")
