@@ -270,6 +270,7 @@ class APITests(TestCase):
         for case in cases:
             if (case.notes == note):
                 case_id = case.id
+        test_case = Case.objects.get(id=case_id)
 
         # --- Login "user2" to edit the case we just created ---
         self.client.login(username="user2", password="password2")
@@ -283,7 +284,6 @@ class APITests(TestCase):
             edited_by.append(user)
 
         # --- Check if the case was created by "user1" ---
-        test_case = Case.objects.get(id=case_id)
         created_by_username = str(test_case.created_by)
         self.assertEqual(created_by_username, "user1")
 
