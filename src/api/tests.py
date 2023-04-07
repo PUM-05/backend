@@ -251,3 +251,43 @@ class APITests(TestCase):
 
         no_cases_after = len(Case.objects.all())
         self.assertEqual(no_cases_before, no_cases_after)
+
+    def test_case_created_by_and_edited_by(self) -> None:
+        """
+        Tests if we save the user who created a case correctly in the database aswell as if
+        we correctly saves the list of users who has edited the case.
+        """
+
+        # --- Login "user1" to create a case ---
+        self.client.login(username="user1", password="")
+        note = "This note is used to test created by and edited by."
+        dictionary = {"notes": note}
+        response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
+
+        # --- Find the ID of the case we just created ---
+        cases = Case.objects.all()
+        case_id = None
+        for case in cases:
+            if (case.notes == note):
+                case_id = case.id
+
+        # --- Login "user2" to edit the case we just created ---
+        self.client.login(username="user2", password="password2")
+        dictionary = {"notes": "it works!"}
+        response = self.client.patch(
+            CASE_PATH + f"/{case_id}", dictionary, content_type=CONTENT_TYPE_JSON)
+
+        # --- Get a list of all users that have edited the case ---
+        edited_by = []
+        for user in test_case.edited_by.all():
+            edited_by.append(user)
+
+        # --- Check if the case was created by "user1" ---
+        test_case = Case.objects.get(id=case_id)
+        created_by_username = str(test_case.created_by)
+        self.assertEqual(created_by_username, "user1")
+
+        # --- Check if the case only has been edited by one user and that it is "user2" ---
+        edited_by_username = str(edited_by[0])
+        self.assertEqual(len(edited_by), 1)
+        self.assertEqual(edited_by_username, "user2")

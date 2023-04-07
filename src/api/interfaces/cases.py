@@ -30,11 +30,9 @@ def create_case(dictionary: Dict) -> Case:
     the data is incorrect. Returns the new case.
     """
     validate_case(dictionary)
-
     case = Case()
-
     fill_case(case, dictionary)
-    case.save()
+
     return case
 
 
@@ -44,11 +42,9 @@ def update_case(case_id: int, dictionary: Dict) -> Case:
     and ValueError if the dictionary contains bad data. Returns the edited case.
     """
     validate_case(dictionary)
-
     case = Case.objects.get(id=case_id)
-
     fill_case(case, dictionary)
-    case.save()
+
     return case
 
 

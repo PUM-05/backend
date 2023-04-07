@@ -73,8 +73,10 @@ def case(request: HttpRequest) -> HttpResponse:
         try:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
+
             new_case = cases.create_case(dictionary)
             new_case.created_by = request.user
+            new_case.save()
 
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
             return HttpResponse(status=400, content=str(error))
@@ -93,8 +95,11 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
         try:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
+
             updated_case = cases.update_case(id, dictionary)
             updated_case.edited_by.add(request.user)
+            updated_case.save()
+
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
             return HttpResponse(status=400, content=str(error))
         except Case.DoesNotExist as error:
