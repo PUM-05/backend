@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Any, Dict, List
+from django.db.models import Q
 
 from api.models import Category, Case
 
@@ -8,8 +9,51 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     """
     Returns all cases that match the given parameters.
     """
-    # TODO: Implement parameters
-    return list(Case.objects.all().values())
+    query = Q()
+    per_page = 100
+    page = 1
+    valid_params = {"id", "index-start", "index-end", "time-start", "time-end",
+                    "category", "medium", "per-page", "page"}
+
+    for param, value in parameters:
+        if param not in valid_params:
+            raise ValueError(f"Unexpected parameter: {param}={value}.")
+
+    if "id" in parameters:
+        query &= Q(id=parameters["id"])
+
+    if "index-start" in parameters:
+        query &= Q(id__gte=parameters["index-start"])
+
+    if "index-end" in parameters:
+        query &= Q(id__lte=parameters["index-end"])
+
+    if "time-start" in parameters:
+
+        query &= Q(created_at__gte=parameters["time-start"])
+
+    if "time-end" in parameters:
+        query &= Q(created_at__lte=parameters["time-end"])
+
+    if "category" in parameters:
+        try:
+            category = Category.objects.get(id=parameters["category"])
+        except Category.DoesNotExist:
+            raise ValueError(f"Category id={parameters['category']} does not exist")
+        query &= Q(category=category)
+
+    if "medium" in parameters:
+        query &= Q(medium=parameters["medium"])
+
+    if "per-page" in parameters:
+        per_page = parameters["per-page"]
+
+    if "page" in parameters:
+        page = parameters["page"]
+
+    start = per_page * (page - 1)
+    end = per_page * page
+    return list(Case.objects.get(query)[start:end].values())
 
 
 def validate_case(dictionary: Dict) -> None:

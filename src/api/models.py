@@ -47,3 +47,7 @@ class Case(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.SET_NULL, null=True)
     user = models.ManyToManyField(User)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = "cases"
