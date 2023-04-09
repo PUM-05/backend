@@ -51,3 +51,8 @@ class Case(models.Model):
         User, on_delete=models.SET_NULL, null=True, related_name="created_cases")
     edited_by = models.ManyToManyField(
         User, related_name="edited_cases")
+    user = models.ManyToManyField(User)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name_plural = "cases"
