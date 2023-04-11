@@ -1,8 +1,10 @@
 from django.http import HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
+from .decorators import authentication_required
 
 from api.models import Case
 
@@ -50,6 +52,7 @@ def check(request: HttpRequest) -> HttpResponse:
         return HttpResponse(status=401, content=error_msg)
 
 
+@authentication_required
 @require_http_methods({"GET", "POST"})
 def case(request: HttpRequest) -> HttpResponse:
     """
@@ -71,7 +74,10 @@ def case(request: HttpRequest) -> HttpResponse:
         try:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
-            cases.create_case(dictionary)
+
+            new_case = cases.create_case(dictionary)
+            new_case.created_by = request.user
+            new_case.save()
 
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
             return HttpResponse(status=400, content=str(error))
@@ -79,6 +85,7 @@ def case(request: HttpRequest) -> HttpResponse:
         return HttpResponse(status=201)
 
 
+@authentication_required
 @require_http_methods({"PATCH", "DELETE"})
 def case_id(request: HttpRequest, id: int) -> HttpResponse:
     """
@@ -89,7 +96,11 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
         try:
             json_string = request.body.decode()
             dictionary = json.loads(json_string)
-            cases.update_case(id, dictionary)
+
+            updated_case = cases.update_case(id, dictionary)
+            updated_case.edited_by.add(request.user)
+            updated_case.save()
+
         except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
             return HttpResponse(status=400, content=str(error))
         except Case.DoesNotExist as error:

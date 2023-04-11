@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'api.apps.ApiConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -43,12 +44,17 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_METHODS = ['GET',    'POST',    'PUT',    'PATCH',    'DELETE',    'OPTIONS']
+
 
 ROOT_URLCONF = 'backend.urls'
 
