@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
+from .decorators import authentication_required
 
 from api.models import Case
 
@@ -51,7 +52,7 @@ def check(request: HttpRequest) -> HttpResponse:
         return HttpResponse(status=401, content=error_msg)
 
 
-@login_required
+@authentication_required
 @require_http_methods({"GET", "POST"})
 def case(request: HttpRequest) -> HttpResponse:
     """
@@ -84,7 +85,7 @@ def case(request: HttpRequest) -> HttpResponse:
         return HttpResponse(status=201)
 
 
-@login_required
+@authentication_required
 @require_http_methods({"PATCH", "DELETE"})
 def case_id(request: HttpRequest, id: int) -> HttpResponse:
     """
