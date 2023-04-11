@@ -9,7 +9,17 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     Returns all cases that match the given parameters.
     """
     # TODO: Implement parameters
-    return list(Case.objects.all().values())
+
+    cases = list(Case.objects.all().values())
+    for case in cases:
+        # Change all datetimes to seconds
+        keys = ["additional_time", "form_fill_time", "customer_time"]
+
+        for key in keys:
+            if case[key] is not None:
+                case[key] = case[key].total_seconds()
+
+    return cases
 
 
 def validate_case(dictionary: Dict) -> None:
