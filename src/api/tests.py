@@ -1,3 +1,4 @@
+import time
 from datetime import timedelta
 import json
 from django.test import TestCase
@@ -158,10 +159,46 @@ class APITests(TestCase):
         data = json.loads(content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 3)
-        self.assertEqual(data[0]["medium"], None)
-        self.assertEqual(data[1]["medium"], "phone")
-        self.assertEqual(data[2]["medium"], "email")
+        self.assertEqual(data["result_count"], 3)
+        self.assertEqual(data["cases"][2]["medium"], None)
+        self.assertEqual(data["cases"][1]["medium"], "phone")
+        self.assertEqual(data["cases"][0]["medium"], "email")
+
+    def test_get_case_with_parameters(self) -> None:
+
+        # Case.objects.create(medium="email", category_id=3) <- i setUp
+        Case.objects.create(medium="email", category_id=3)
+        Case.objects.create(medium="email", category_id=3)
+        Case.objects.create(medium="email", category_id=2)
+        Case.objects.create(medium="email", category_id=2)
+        Case.objects.create(medium="email", category_id=2)
+        # Case.objects.create(medium="phone") <- i setUp
+        Case.objects.create(medium="phone", category_id=3)
+        Case.objects.create(medium="phone", category_id=3)
+        Case.objects.create(medium="phone", category_id=2)
+        Case.objects.create(medium="phone", category_id=2)
+        Case.objects.create(medium="phone", category_id=2)
+
+        positive_parameters = {
+            "/id=1": 1,
+            "/index-start=2": 12,
+            "/index-end=4": 4,
+            "/category-id=2": 6,
+            "/medium=email": 6,
+            "/medium=email&category-id=2": 3,
+            "/index-start=2&index-end=4": 3,
+        }
+
+        for param in positive_parameters:
+            response = self.client.get(CASE_PATH+param)
+            content = response.content.decode()
+            try:
+                data = json.loads(content)
+            except json.JSONDecodeError:
+                print(f"Content: {content}")
+                raise json.JSONDecodeError
+            self.assertEqual(data["result_count"], positive_parameters[param],
+                             f"parameter {param} gave result:\n{data}\n")
 
     def test_patch_case(self) -> None:
 
@@ -244,7 +281,7 @@ class APITests(TestCase):
 
         response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
-        response = self.client.delete(CASE_PATH + "/anders", content_type=CONTENT_TYPE_JSON)
+        response = self.client.delete(CASE_PATH + "/864", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
         response = self.client.delete(CASE_PATH + "/", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)

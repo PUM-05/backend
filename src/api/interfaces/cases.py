@@ -5,19 +5,20 @@ from django.db.models import Q
 from api.models import Category, Case
 
 
-def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
+def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
+
     query = Q()
     per_page = 100
     page = 1
     valid_params = {"id", "index-start", "index-end", "time-start", "time-end",
-                    "category", "medium", "per-page", "page"}
+                    "category-id", "medium", "per-page", "page"}
 
-    for param, value in parameters:
+    for param in parameters:
         if param not in valid_params:
-            raise ValueError(f"Unexpected parameter: {param}={value}.")
+            raise ValueError(f"Unexpected parameter: {param}={parameters[param]}.")
 
     if "id" in parameters:
         query &= Q(id=parameters["id"])
@@ -35,11 +36,11 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     if "time-end" in parameters:
         query &= Q(created_at__lte=parameters["time-end"])
 
-    if "category" in parameters:
+    if "category-id" in parameters:
         try:
-            category = Category.objects.get(id=parameters["category"])
+            category = Category.objects.get(id=parameters["category-id"])
         except Category.DoesNotExist:
-            raise ValueError(f"Category id={parameters['category']} does not exist")
+            raise ValueError(f"Category id={parameters['category-id']} does not exist")
         query &= Q(category=category)
 
     if "medium" in parameters:
@@ -54,16 +55,26 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
     start = per_page * (page - 1)
     end = per_page * page
 
-    cases = list(Case.objects.get(query)[start:end].values())
-    for case in cases:
+    result = list(Case.objects.filter(query)[start:end+1].values())
+    has_more = len(result) == per_page + 1
+    result_count = len(result)
+
+    if has_more:
+        result_count = len(result) - 1
+        result = result[:-1]
+
+    for case in result:
         # Change all datetimes to seconds
         keys = ["additional_time", "form_fill_time", "customer_time"]
 
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
-    return cases
-
+    return {
+        "result_count": result_count,
+        "has_more": has_more,
+        "cases": result,
+    }
 
 
 def validate_case(dictionary: Dict) -> None:
