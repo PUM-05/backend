@@ -3,6 +3,7 @@ import json
 from django.test import TestCase
 from api.models import Category, Case
 from django.contrib.auth.models import User
+from datetime import datetime
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
@@ -291,3 +292,14 @@ class APITests(TestCase):
         edited_by_username = str(edited_by[0])
         self.assertEqual(len(edited_by), 1)
         self.assertEqual(edited_by_username, "user2")
+
+    def test_count_medium(self) -> None:
+
+        end_time = datetime.now()
+        start_time = end_time - timedelta(days=7)
+        print(start_time)
+
+        response = self.client.get(
+            "stats/medium?start_time=&end_time=")
+        print(response)
+        self.assertEqual(response.status_code, 200)

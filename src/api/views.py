@@ -8,7 +8,7 @@ from .decorators import authentication_required
 
 from api.models import Case
 
-from .interfaces import cases, auth
+from .interfaces import cases, auth, stats
 
 
 def login(request: HttpRequest) -> HttpResponse:
@@ -123,3 +123,19 @@ def case_categories(request: HttpRequest) -> HttpResponse:
     """
     categories_json = json.dumps(cases.get_case_categories())
     return HttpResponse(categories_json, content_type="application/json", status=200)
+
+
+@require_http_methods({"GET"})
+def medium(request: HttpRequest) -> HttpResponse:
+
+    params = request.GET.dict()
+
+    try:
+        start_time = params["start_time"]
+        end_time = params["end_time"]
+
+    except KeyError as error:
+        return HttpResponse(status=400, content=str(error))
+
+    medium_stats = json.dumps(stats.get_medium_count(start_time, end_time))
+    return HttpResponse(medium_stats, content_type="application/json", status=200)
