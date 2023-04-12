@@ -54,8 +54,13 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     start = per_page * (page - 1)
     end = per_page * page
 
-    result = list(Case.objects.filter(query)[start:end+1].values())
-    has_more = len(result) == per_page + 1
+    if per_page != 0:
+        result = list(Case.objects.filter(query)[start:end+1].values())
+        has_more = len(result) == per_page + 1
+    else:
+        result = list(Case.objects.filter(query).values())
+        has_more = False
+
     result_count = len(result)
 
     if has_more:

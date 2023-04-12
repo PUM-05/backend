@@ -146,7 +146,9 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_case_without_parameters(self) -> None:
-
+        """
+        Tests that cases are returned and in the correct order with correct status code.
+        """
         response = self.client.get(CASE_PATH)
         content = response.content.decode()
         data = json.loads(content)
@@ -158,7 +160,10 @@ class APITests(TestCase):
         self.assertEqual(data["cases"][0]["medium"], "email")
 
     def test_get_case_with_parameters(self) -> None:
-        
+        """
+        Tests that the correct amount of cases are returned from a set of queries,
+        as well as getting the correct status codes.
+        """
         # Case.objects.create(medium="email", category_id=3) <- i setUp
         Case.objects.create(medium="email", category_id=3)
         Case.objects.create(medium="email", category_id=3)
@@ -194,14 +199,10 @@ class APITests(TestCase):
                 # -1 indicates that status 400 should be returned
                 self.assertEqual(response.status_code, 400)
             else:
-                try:
-                    data = json.loads(content)
-                except json.JSONDecodeError:
-                    print(f"\nParameters: {param}\n")
-                    print(f"Content: {content}\n")
-                    raise json.JSONDecodeError
-                self.assertEqual(data["result_count"], parameters[param],
-                                 f"parameter {param} gave result:\n{data}\n")
+                self.assertEqual(response.status_code, 200)
+                data = json.loads(content)
+                self.assertEqual(data["result_count"], parameters[param])
+                self.assertEqual(data["result_count"], len(data["cases"]))
 
     def test_patch_case(self) -> None:
 
