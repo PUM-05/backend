@@ -70,6 +70,7 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
+
     return {
         "result_count": result_count,
         "has_more": has_more,
