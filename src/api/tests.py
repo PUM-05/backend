@@ -158,7 +158,7 @@ class APITests(TestCase):
         self.assertEqual(data["cases"][0]["medium"], "email")
 
     def test_get_case_with_parameters(self) -> None:
-
+        
         # Case.objects.create(medium="email", category_id=3) <- i setUp
         Case.objects.create(medium="email", category_id=3)
         Case.objects.create(medium="email", category_id=3)
@@ -180,24 +180,28 @@ class APITests(TestCase):
             "/medium=email": 6,
             "/medium=email&category-id=2": 3,
             "/index-start=2&index-end=4": 3,
-            "id=87": 0,
+            "/id=87": 0,
             "/index-end=0": 0,
             "/index-start=2&index-end=1": 0,
-            "/category-id=2&category-id=3": 0,
-            "/category-id=12": 0,
+            "/category-id=hej": -1,
+            "/category-id=12": -1,
         }
 
         for param in parameters:
             response = self.client.get(CASE_PATH+param)
             content = response.content.decode()
-            try:
-                data = json.loads(content)
-            except json.JSONDecodeError:
-                print(f"\nParameters: {param}\n")
-                print(f"Content: {content}\n")
-                raise json.JSONDecodeError
-            self.assertEqual(data["result_count"], parameters[param],
-                             f"parameter {param} gave result:\n{data}\n")
+            if parameters[param] == -1:
+                # -1 indicates that status 400 should be returned
+                self.assertEqual(response.status_code, 400)
+            else:
+                try:
+                    data = json.loads(content)
+                except json.JSONDecodeError:
+                    print(f"\nParameters: {param}\n")
+                    print(f"Content: {content}\n")
+                    raise json.JSONDecodeError
+                self.assertEqual(data["result_count"], parameters[param],
+                                 f"parameter {param} gave result:\n{data}\n")
 
     def test_patch_case(self) -> None:
 

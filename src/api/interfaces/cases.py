@@ -9,7 +9,6 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
-
     query = Q()
     per_page = 100
     page = 1
