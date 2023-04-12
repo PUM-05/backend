@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, QueryDict
 from django.views.decorators.http import require_http_methods
 from django.core.serializers.json import DjangoJSONEncoder
 import json
@@ -51,20 +51,22 @@ def check(request: HttpRequest) -> HttpResponse:
 
 
 @require_http_methods({"GET", "POST"})
-def case(request: HttpRequest) -> HttpResponse:
+def case(request: HttpRequest, str_params="") -> HttpResponse:
     """
     GET: Returns all cases that match the query parameters.
     POST: Creates a new case based on data passed in the request body.
     """
+    params = {}
+    if str_params:
+        params = QueryDict(str_params).dict()
     if request.method == "GET":
-        params = request.GET.dict()
-
         try:
             matching_cases = cases.get_cases(params)
         except ValueError as error:
             return HttpResponse(status=400, content=str(error))
 
         cases_json = json.dumps(matching_cases, cls=DjangoJSONEncoder)
+
         return HttpResponse(cases_json, content_type="application/json", status=200)
 
     elif request.method == "POST":
