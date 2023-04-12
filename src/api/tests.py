@@ -33,6 +33,9 @@ class APITests(TestCase):
         user2.set_password("password2")
         user2.save()
 
+        # Login required to create cases
+        self.client.login(username="user1", password="")
+
     def test_login_correct(self) -> None:
         """
         Tests that the login endpoint returns a 204 status code and a session
@@ -73,6 +76,9 @@ class APITests(TestCase):
         Tests that the logout endpoint returns a 204 status code when the user
         is logged in and a 401 status code when the user is not logged in.
         """
+
+        self.client.get("/api/logout")   # Logout due to login in SetUp
+
         response = self.client.get("/api/logout")
         self.assertEqual(response.status_code, 401)
 
@@ -88,6 +94,9 @@ class APITests(TestCase):
         Tests that the check endpoint returns a 204 status code when the user is
         logged in and a 401 status code when the user is not logged in.
         """
+
+        self.client.get("/api/logout")  # Logout due to login in SetUp
+
         response = self.client.get("/api/check")
         self.assertEqual(response.status_code, 401)
 
@@ -97,10 +106,6 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
 
         for i in range(10):
             notes = "notes" + str(i)
@@ -120,10 +125,6 @@ class APITests(TestCase):
 
     def test_create_case_incorrect_category(self) -> None:
 
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         category = 945
         notes = "notes"
         medium = "email"
@@ -135,10 +136,6 @@ class APITests(TestCase):
 
     def test_create_case_incorrect_medium(self) -> None:
 
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         category = 5
         notes = "notes"
         medium = "tiktok"
@@ -149,10 +146,6 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_case_without_parameters(self) -> None:
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
 
         response = self.client.get(CASE_PATH)
         content = response.content.decode()
@@ -195,16 +188,13 @@ class APITests(TestCase):
             try:
                 data = json.loads(content)
             except json.JSONDecodeError:
-                print(f"Content: {content}")
+                print(f"\nParameters: {param}\n")
+                print(f"Content: {content}\n")
                 raise json.JSONDecodeError
             self.assertEqual(data["result_count"], positive_parameters[param],
                              f"parameter {param} gave result:\n{data}\n")
 
     def test_patch_case(self) -> None:
-
-        # Login required to edit cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
 
         dictionary = {"notes": "new notes"}
 
@@ -249,10 +239,6 @@ class APITests(TestCase):
         deleted object will result in an error.
         """
 
-        # Login required to delete cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/1", content_type=CONTENT_TYPE_JSON)
@@ -273,10 +259,6 @@ class APITests(TestCase):
         number of cases remain the same.
         """
 
-        # Login required to delete cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)
@@ -295,8 +277,7 @@ class APITests(TestCase):
         we correctly saves the list of users who has edited the case.
         """
 
-        # --- Login "user1" to create a case ---
-        self.client.login(username="user1", password="")
+        # --- Login "user1" to create a case done in SetUp ---
         note = "This note is used to test created by and edited by."
         dictionary = {"notes": note}
         response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
@@ -305,7 +286,7 @@ class APITests(TestCase):
         cases = Case.objects.all()
         case_id = None
         for case in cases:
-            if (case.notes == note):
+            if case.notes == note:
                 case_id = case.id
         test_case = Case.objects.get(id=case_id)
 
