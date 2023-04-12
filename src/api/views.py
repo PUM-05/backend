@@ -1,6 +1,5 @@
 from django.http import HttpResponse, HttpRequest, QueryDict
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
@@ -69,7 +68,7 @@ def case(request: HttpRequest, str_params="") -> HttpResponse:
             return HttpResponse(status=400, content=str(error))
 
         cases_json = json.dumps(matching_cases, cls=DjangoJSONEncoder)
-
+        print(f"\nparams: {str_params}\ncases: {cases_json}\n")
         return HttpResponse(cases_json, content_type="application/json", status=200)
 
     elif request.method == "POST":

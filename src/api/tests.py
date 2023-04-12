@@ -172,7 +172,7 @@ class APITests(TestCase):
         Case.objects.create(medium="phone", category_id=2)
         Case.objects.create(medium="phone", category_id=2)
 
-        positive_parameters = {
+        parameters = {
             "/id=1": 1,
             "/index-start=2": 12,
             "/index-end=4": 4,
@@ -180,9 +180,14 @@ class APITests(TestCase):
             "/medium=email": 6,
             "/medium=email&category-id=2": 3,
             "/index-start=2&index-end=4": 3,
+            "id=87": 0,
+            "/index-end=0": 0,
+            "/index-start=2&index-end=1": 0,
+            "/category-id=2&category-id=3": 0,
+            "/category-id=12": 0,
         }
 
-        for param in positive_parameters:
+        for param in parameters:
             response = self.client.get(CASE_PATH+param)
             content = response.content.decode()
             try:
@@ -191,7 +196,7 @@ class APITests(TestCase):
                 print(f"\nParameters: {param}\n")
                 print(f"Content: {content}\n")
                 raise json.JSONDecodeError
-            self.assertEqual(data["result_count"], positive_parameters[param],
+            self.assertEqual(data["result_count"], parameters[param],
                              f"parameter {param} gave result:\n{data}\n")
 
     def test_patch_case(self) -> None:
