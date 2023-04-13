@@ -53,17 +53,14 @@ def check(request: HttpRequest) -> HttpResponse:
 
 @authentication_required
 @require_http_methods({"GET", "POST"})
-def case(request: HttpRequest, str_params="") -> HttpResponse:
+def case(request: HttpRequest) -> HttpResponse:
     """
     GET: Returns all cases that match the query parameters.
     POST: Creates a new case based on data passed in the request body.
     """
-    params = {}
-    if str_params:
-        params = QueryDict(str_params).dict()
     if request.method == "GET":
         try:
-            matching_cases = cases.get_cases(params)
+            matching_cases = cases.get_cases(request.GET.dict())
         except ValueError as error:
             return HttpResponse(status=400, content=str(error))
 

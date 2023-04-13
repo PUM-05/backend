@@ -179,20 +179,20 @@ class APITests(TestCase):
         Case.objects.create(medium="phone", category_id=2)
 
         parameters = {
-            "/id=1": 1,
-            "/category-id=2": 6,
-            "/medium=email": 6,
-            "/medium=email&category-id=2": 3,
-            "/time-start=2019-01-01 00:00:00Z": 13,
-            "/time-end=2024-02-02 00:00:00Z": 13,
-            "/per-page=2": 2,
-            "/per-page=0": 13,
-            "/id=87": 0,
-            "/category-id=hej": -1,
-            "/category-id=12": -1,
-            "/invalid-param=abc": -1,
-            "/time-end=2019-02-02 00:00:00Z": 0,
-            "/time-start=2019-01-01 00:00:00Z&time-end=2018-01-01 00:00:00Z": 0,
+            "?id=1": 1,
+            "?category-id=2": 6,
+            "?medium=email": 6,
+            "?medium=email&category-id=2": 3,
+            "?time-start=2019-01-01 00:00:00Z": 13,
+            "?time-end=2024-02-02 00:00:00Z": 13,
+            "?per-page=2": 2,
+            "?per-page=0": 13,
+            "?id=87": 0,
+            "?category-id=hej": -1,
+            "?category-id=12": -1,
+            "?invalid-param=abc": -1,
+            "?time-end=2019-02-02 00:00:00Z": 0,
+            "?time-start=2019-01-01 00:00:00Z&time-end=2018-01-01 00:00:00Z": 0,
         }
 
         for param in parameters:
