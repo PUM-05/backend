@@ -189,7 +189,7 @@ Query parameters:
 - `time-end: DateTime`
 - `category-id: int`
 - `medium: string`
-- `per-page: int (default 100, set to 0 to disable pages)`
+- `per-page: int (Returns all cases unless specified)`
 - `page: int (default 1)`
 
 Request:

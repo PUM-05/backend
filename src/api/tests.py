@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
+LOGOUT_PATH = "/api/logout"
 
 
 class APITests(TestCase):
@@ -77,14 +78,14 @@ class APITests(TestCase):
         is logged in and a 401 status code when the user is not logged in.
         """
 
-        self.client.get("/api/logout")   # Logout due to login in SetUp
+        self.client.get(LOGOUT_PATH)   # Logout due to login in SetUp
 
-        response = self.client.get("/api/logout")
+        response = self.client.get(LOGOUT_PATH)
         self.assertEqual(response.status_code, 401)
 
         self.client.login(username="user1", password="")
 
-        response = self.client.get("/api/logout")
+        response = self.client.get(LOGOUT_PATH)
         self.assertEqual(response.status_code, 204)
         response = self.client.get("/api/check")
         self.assertEqual(response.status_code, 401)
@@ -95,7 +96,7 @@ class APITests(TestCase):
         logged in and a 401 status code when the user is not logged in.
         """
 
-        self.client.get("/api/logout")  # Logout due to login in SetUp
+        self.client.get(LOGOUT_PATH)  # Logout due to login in SetUp
 
         response = self.client.get("/api/check")
         self.assertEqual(response.status_code, 401)

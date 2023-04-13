@@ -9,16 +9,14 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
-    query = Q()
-    per_page = 100
-    page = 1
     valid_params = {"id", "index-start", "index-end", "time-start", "time-end",
                     "category-id", "medium", "per-page", "page"}
 
-    for param in parameters:
-        if param not in valid_params:
-            raise ValueError(f"Unexpected parameter: {param}={parameters[param]}.")
+    invalid_params = set(parameters.keys()) - valid_params
+    if invalid_params:
+        raise ValueError(f"Unexpected parameters: {invalid_params}.")
 
+    query = Q()
     if "id" in parameters:
         query &= Q(id=parameters["id"])
 
@@ -45,40 +43,30 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     if "medium" in parameters:
         query &= Q(medium=parameters["medium"])
 
-    if "per-page" in parameters:
-        per_page = parameters["per-page"]
-
-    if "page" in parameters:
-        page = parameters["page"]
-
+    per_page = parameters.get("per-page", 1e9)
+    page = parameters.get("page", 1)
     start = per_page * (page - 1)
     end = per_page * page
 
-    if per_page != 0:
-        result = list(Case.objects.filter(query)[start:end+1].values())
-        has_more = len(result) == per_page + 1
-    else:
-        result = list(Case.objects.filter(query).values())
-        has_more = False
-
-    result_count = len(result)
-
+    cases = Case.objects.filter(query)[start:end + 1].values()
+    has_more = len(cases) == per_page + 1
     if has_more:
-        result_count = len(result) - 1
-        result = result[:-1]
+        cases = cases[:-1]
+    result_count = len(cases)
 
-    for case in result:
+    results = []
+    for case in cases:
         # Change all datetimes to seconds
         keys = ["additional_time", "form_fill_time", "customer_time"]
-
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
+        results.append(case)
 
     return {
         "result_count": result_count,
         "has_more": has_more,
-        "cases": result,
+        "cases": results,
     }
 
 
