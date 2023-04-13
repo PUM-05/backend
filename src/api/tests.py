@@ -186,6 +186,7 @@ class APITests(TestCase):
             "/time-start=2019-01-01 00:00:00Z": 13,
             "/time-end=2024-02-02 00:00:00Z": 13,
             "/per-page=2": 2,
+            "/per-page=0": 13,
             "/id=87": 0,
             "/category-id=hej": -1,
             "/category-id=12": -1,
