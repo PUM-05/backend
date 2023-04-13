@@ -192,13 +192,13 @@ Query parameters:
 
 Request:
 ``` http
-GET /api/case/
-GET /api/case/<query>
+GET /api/case
+GET /api/case?<query>
 ```
 
 Example:
 ``` http
-GET /api/case/category-id=2&medium=phone&per-page=20&page=3
+GET /api/case?category-id=2&medium=phone&per-page=20&page=3
 ```
 
 Success response:
