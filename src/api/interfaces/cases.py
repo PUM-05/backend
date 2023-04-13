@@ -22,6 +22,11 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
         if param not in valid_params:
             raise ValueError(f"Unexpected parameter: {param}={parameters[param]}.")
 
+    """
+    Builds a query using dict comprehension, which is basically like a mapping function.
+    It creates a set of queries from the key-value pairs in parameters with the individual queries
+    looking like "params[key]=value". Only the key-value pairs where key is in params are included.
+    """
     query = Q(**{params[k]: v for k, v in parameters.items() if k in params.keys()})    # magic
 
     if "category-id" in parameters:

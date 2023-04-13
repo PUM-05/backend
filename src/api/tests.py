@@ -191,6 +191,7 @@ class APITests(TestCase):
             "?category-id=hej": -1,
             "?category-id=12": -1,
             "?invalid-param=abc": -1,
+            "?per-page=hej": -1,
             "?time-end=2019-02-02 00:00:00Z": 0,
             "?time-start=2019-01-01 00:00:00Z&time-end=2018-01-01 00:00:00Z": 0,
         }
