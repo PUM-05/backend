@@ -180,21 +180,26 @@ class APITests(TestCase):
 
         parameters = {
             "/id=1": 1,
-            "/index-start=2": 12,
-            "/index-end=4": 4,
             "/category-id=2": 6,
             "/medium=email": 6,
             "/medium=email&category-id=2": 3,
-            "/index-start=2&index-end=4": 3,
+            "/time-start=2019-01-01 00:00:00Z": 13,
+            "/time-end=2024-02-02 00:00:00Z": 13,
+            "/per-page=2": 2,
             "/id=87": 0,
-            "/index-end=0": 0,
-            "/index-start=2&index-end=1": 0,
             "/category-id=hej": -1,
             "/category-id=12": -1,
+            "/invalid-param=abc": -1,
+            "/time-end=2019-02-02 00:00:00Z": 0,
+            "/time-start=2019-01-01 00:00:00Z&time-end=2018-01-01 00:00:00Z": 0,
         }
 
         for param in parameters:
-            response = self.client.get(CASE_PATH+param)
+            try:
+                response = self.client.get(CASE_PATH+param)
+            except TypeError:
+                print(param)
+                raise TypeError
             content = response.content.decode()
             if parameters[param] == -1:
                 # -1 indicates that status 400 should be returned

@@ -9,29 +9,20 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
-    valid_params = {"id", "index-start", "index-end", "time-start", "time-end",
-                    "category-id", "medium", "per-page", "page"}
+    valid_params = {"id", "time-start", "time-end", "category-id", "medium", "per-page", "page"}
 
-    invalid_params = set(parameters.keys()) - valid_params
-    if invalid_params:
-        raise ValueError(f"Unexpected parameters: {invalid_params}.")
+    params = {
+        "id": "id",
+        "time-start": "created_at__gte",
+        "time-end": "created_at__lte",
+        "medium": "medium",
+    }
 
-    query = Q()
-    if "id" in parameters:
-        query &= Q(id=parameters["id"])
+    for param in parameters:
+        if param not in valid_params:
+            raise ValueError(f"Unexpected parameter: {param}={parameters[param]}.")
 
-    if "index-start" in parameters:
-        query &= Q(id__gte=parameters["index-start"])
-
-    if "index-end" in parameters:
-        query &= Q(id__lte=parameters["index-end"])
-
-    if "time-start" in parameters:
-
-        query &= Q(created_at__gte=parameters["time-start"])
-
-    if "time-end" in parameters:
-        query &= Q(created_at__lte=parameters["time-end"])
+    query = Q(**{params[k]: v for k, v in parameters.items() if k in params.keys()})    # magic
 
     if "category-id" in parameters:
         try:
@@ -40,33 +31,36 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
             raise ValueError(f"Category id={parameters['category-id']} does not exist")
         query &= Q(category=category)
 
-    if "medium" in parameters:
-        query &= Q(medium=parameters["medium"])
-
-    per_page = parameters.get("per-page", 1e9)
-    page = parameters.get("page", 1)
+    per_page = int(parameters.get("per-page", 100))
+    page = int(parameters.get("page", 1))
     start = per_page * (page - 1)
     end = per_page * page
 
-    cases = Case.objects.filter(query)[start:end + 1].values()
-    has_more = len(cases) == per_page + 1
-    if has_more:
-        cases = cases[:-1]
-    result_count = len(cases)
+    if per_page != 0:
+        result = list(Case.objects.filter(query)[start:end+1].values())
+        has_more = len(result) == per_page + 1
+    else:
+        result = list(Case.objects.filter(query).values())
+        has_more = False
 
-    results = []
-    for case in cases:
+    for case in result:
         # Change all datetimes to seconds
         keys = ["additional_time", "form_fill_time", "customer_time"]
+
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
-        results.append(case)
+
+    result_count = len(result)
+
+    if has_more:
+        result_count -= 1
+        result = result[:-1]
 
     return {
         "result_count": result_count,
         "has_more": has_more,
-        "cases": results,
+        "cases": result,
     }
 
 

@@ -54,5 +54,5 @@ class Case(models.Model):
     user = models.ManyToManyField(User)
 
     class Meta:
-        ordering = ['-id']
+        ordering = ['-created_at', '-id']
         verbose_name_plural = "cases"

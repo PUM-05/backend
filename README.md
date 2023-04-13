@@ -183,13 +183,11 @@ A request without parameters returns the latest 100 cases.
 
 Query parameters:
 - `id: int`
-- `index-start: int`
-- `index-end: int`
 - `time-start: DateTime`
 - `time-end: DateTime`
 - `category-id: int`
 - `medium: string`
-- `per-page: int (Returns all cases unless specified)`
+- `per-page: int (default 100, set to 0 to disable pages)`
 - `page: int (default 1)`
 
 Request:
