@@ -195,11 +195,7 @@ class APITests(TestCase):
         }
 
         for param in parameters:
-            try:
-                response = self.client.get(CASE_PATH+param)
-            except TypeError:
-                print(param)
-                raise TypeError
+            response = self.client.get(CASE_PATH+param)
             content = response.content.decode()
             if parameters[param] == -1:
                 # -1 indicates that status 400 should be returned
