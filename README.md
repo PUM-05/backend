@@ -178,24 +178,36 @@ Status: 401 (Unauthorized)
 
 ## Cases
 ### Get cases
-Returns a list with all cases sorted chronologically that matches the given query parameters.
+Returns a list with all cases sorted chronologically (latest at top) that match the given query parameters.
+A request without parameters returns the latest 100 cases.
 
 Query parameters:
-- `id: int` (Not jet implemented)
-- `index-start: int` (Not jet implemented)
-- `index-end: int` (Not jet implemented)
-- `category_id: int` (Not jet implemented)
+- `id: int`
+- `time-start: DateTime`
+- `time-end: DateTime`
+- `category-id: int`
+- `medium: string`
+- `per-page: int (default 100, set to 0 to disable pages)`
+- `page: int (default 1)`
 
 Request:
 ``` http
-GET /api/case/
+GET /api/case
+GET /api/case?<query>
+```
+
+Example:
+``` http
+GET /api/case?category-id=2&medium=phone&per-page=20&page=3
 ```
 
 Success response:
 ``` http
 Status: 200 (OK)
-
-[
+{
+  "result_count": 1,
+  "has_more": false,
+  "cases": [
     {
         "id": 1,
         "notes": "Example notes 1",
@@ -207,7 +219,8 @@ Status: 200 (OK)
         "updated_at": "yyyy-mm-ddThh:mm:ssZ",
         "category_id": 1,
     },
-]
+  ]
+}
 ```
 
 ### Create case

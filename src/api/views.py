@@ -1,6 +1,5 @@
-from django.http import HttpResponse, HttpRequest
+from django.http import HttpResponse, HttpRequest, QueryDict
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
@@ -60,10 +59,8 @@ def case(request: HttpRequest) -> HttpResponse:
     POST: Creates a new case based on data passed in the request body.
     """
     if request.method == "GET":
-        params = request.GET.dict()
-
         try:
-            matching_cases = cases.get_cases(params)
+            matching_cases = cases.get_cases(request.GET.dict())
         except ValueError as error:
             return HttpResponse(status=400, content=str(error))
 

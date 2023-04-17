@@ -1,3 +1,4 @@
+import time
 from datetime import timedelta
 import json
 from django.test import TestCase
@@ -6,6 +7,7 @@ from django.contrib.auth.models import User
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
+LOGOUT_PATH = "/api/logout"
 
 
 class APITests(TestCase):
@@ -31,6 +33,9 @@ class APITests(TestCase):
         user2 = User.objects.create(username="user2")
         user2.set_password("password2")
         user2.save()
+
+        # Login required to create cases
+        self.client.login(username="user1", password="")
 
     def test_login_correct(self) -> None:
         """
@@ -72,12 +77,15 @@ class APITests(TestCase):
         Tests that the logout endpoint returns a 204 status code when the user
         is logged in and a 401 status code when the user is not logged in.
         """
-        response = self.client.get("/api/logout")
+
+        self.client.get(LOGOUT_PATH)   # Logout due to login in SetUp
+
+        response = self.client.get(LOGOUT_PATH)
         self.assertEqual(response.status_code, 401)
 
         self.client.login(username="user1", password="")
 
-        response = self.client.get("/api/logout")
+        response = self.client.get(LOGOUT_PATH)
         self.assertEqual(response.status_code, 204)
         response = self.client.get("/api/check")
         self.assertEqual(response.status_code, 401)
@@ -87,6 +95,9 @@ class APITests(TestCase):
         Tests that the check endpoint returns a 204 status code when the user is
         logged in and a 401 status code when the user is not logged in.
         """
+
+        self.client.get(LOGOUT_PATH)  # Logout due to login in SetUp
+
         response = self.client.get("/api/check")
         self.assertEqual(response.status_code, 401)
 
@@ -96,10 +107,6 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
 
         for i in range(10):
             notes = "notes" + str(i)
@@ -119,10 +126,6 @@ class APITests(TestCase):
 
     def test_create_case_incorrect_category(self) -> None:
 
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         category = 945
         notes = "notes"
         medium = "email"
@@ -134,10 +137,6 @@ class APITests(TestCase):
 
     def test_create_case_incorrect_medium(self) -> None:
 
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         category = 5
         notes = "notes"
         medium = "tiktok"
@@ -148,26 +147,68 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_get_case_without_parameters(self) -> None:
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
+        """
+        Tests that cases are returned and in the correct order with correct status code.
+        """
         response = self.client.get(CASE_PATH)
         content = response.content.decode()
         data = json.loads(content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 3)
-        self.assertEqual(data[0]["medium"], None)
-        self.assertEqual(data[1]["medium"], "phone")
-        self.assertEqual(data[2]["medium"], "email")
+        self.assertEqual(data["result_count"], 3)
+        self.assertEqual(data["cases"][2]["medium"], None)
+        self.assertEqual(data["cases"][1]["medium"], "phone")
+        self.assertEqual(data["cases"][0]["medium"], "email")
+
+    def test_get_case_with_parameters(self) -> None:
+        """
+        Tests that the correct amount of cases are returned from a set of queries,
+        as well as getting the correct status codes.
+        """
+        # Case.objects.create(medium="email", category_id=3) <- i setUp
+        Case.objects.create(medium="email", category_id=3)
+        Case.objects.create(medium="email", category_id=3)
+        Case.objects.create(medium="email", category_id=2)
+        Case.objects.create(medium="email", category_id=2)
+        Case.objects.create(medium="email", category_id=2)
+        # Case.objects.create(medium="phone") <- i setUp
+        Case.objects.create(medium="phone", category_id=3)
+        Case.objects.create(medium="phone", category_id=3)
+        Case.objects.create(medium="phone", category_id=2)
+        Case.objects.create(medium="phone", category_id=2)
+        Case.objects.create(medium="phone", category_id=2)
+
+        parameters = {
+            "?id=1": 1,
+            "?category-id=2": 6,
+            "?medium=email": 6,
+            "?medium=email&category-id=2": 3,
+            "?time-start=2019-01-01 00:00:00Z": 13,
+            "?time-end=2024-02-02 00:00:00Z": 13,
+            "?per-page=2": 2,
+            "?per-page=0": 13,
+            "?id=87": 0,
+            "?category-id=hej": -1,
+            "?category-id=12": -1,
+            "?invalid-param=abc": -1,
+            "?per-page=hej": -1,
+            "?time-end=2019-02-02 00:00:00Z": 0,
+            "?time-start=2019-01-01 00:00:00Z&time-end=2018-01-01 00:00:00Z": 0,
+        }
+
+        for param in parameters:
+            response = self.client.get(CASE_PATH+param)
+            content = response.content.decode()
+            if parameters[param] == -1:
+                # -1 indicates that status 400 should be returned
+                self.assertEqual(response.status_code, 400)
+            else:
+                self.assertEqual(response.status_code, 200)
+                data = json.loads(content)
+                self.assertEqual(data["result_count"], parameters[param])
+                self.assertEqual(data["result_count"], len(data["cases"]))
 
     def test_patch_case(self) -> None:
-
-        # Login required to edit cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
 
         dictionary = {"notes": "new notes"}
 
@@ -212,10 +253,6 @@ class APITests(TestCase):
         deleted object will result in an error.
         """
 
-        # Login required to delete cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/1", content_type=CONTENT_TYPE_JSON)
@@ -236,15 +273,11 @@ class APITests(TestCase):
         number of cases remain the same.
         """
 
-        # Login required to delete cases
-        self.client.login(username="user1", password="")
-        self.client.login(username="user2", password="password2")
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
-        response = self.client.delete(CASE_PATH + "/anders", content_type=CONTENT_TYPE_JSON)
+        response = self.client.delete(CASE_PATH + "/864", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
         response = self.client.delete(CASE_PATH + "/", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
@@ -258,8 +291,7 @@ class APITests(TestCase):
         we correctly saves the list of users who has edited the case.
         """
 
-        # --- Login "user1" to create a case ---
-        self.client.login(username="user1", password="")
+        # --- Login "user1" to create a case done in SetUp ---
         note = "This note is used to test created by and edited by."
         dictionary = {"notes": note}
         response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
@@ -268,7 +300,7 @@ class APITests(TestCase):
         cases = Case.objects.all()
         case_id = None
         for case in cases:
-            if (case.notes == note):
+            if case.notes == note:
                 case_id = case.id
         test_case = Case.objects.get(id=case_id)
 
