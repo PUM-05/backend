@@ -10,18 +10,18 @@ def static_files(request: HttpRequest) -> HttpResponse:
     path = request.path
 
     if should_return_index(path):
-        return render(request, 'index.html')
-
+        relative_path = "index.html"
     else:
-        try:
-            static_path = path[1:]
-            static_file = open('src/static/' + static_path, 'rb')
-        except FileNotFoundError:
-            return HttpResponse(status=404)
+        relative_path = path[1:]
 
-        file_type = mimetypes.guess_type(path)[0]
+    try:
+        static_file = open("src/static/" + relative_path, "rb")
+    except FileNotFoundError:
+        return HttpResponse(status=404)
 
-        return FileResponse(static_file, content_type=file_type)
+    file_type = mimetypes.guess_type(path)[0]
+
+    return FileResponse(static_file, content_type=file_type)
 
 
 def should_return_index(path: str) -> bool:
