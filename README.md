@@ -296,3 +296,38 @@ Status: 200 (OK)
     }
 ]
 ```
+
+## Statistics
+### Medium
+Returns the number of cases for each medium in the given time period.
+If a start or end date is not specified, the time period will be set to the beginning or end of time respectively.
+
+Query parameters:
+- `start: DateTime`
+- `end: DateTime`
+
+Request:
+``` http
+GET /api/stats/medium?<query>
+```
+
+Example:
+``` http
+GET /api/stats/medium?start=2023-01-01T00:00:00Z&end=2023-12-31T23:59:59Z
+```
+
+Success response:
+``` http
+Status: 200 (OK)
+
+[
+    {
+        "medium": "phone",
+        "count": 5
+    },
+    {
+        "medium": "email",
+        "count": 12
+    },
+]
+```
