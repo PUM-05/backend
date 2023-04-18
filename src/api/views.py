@@ -1,14 +1,12 @@
 from django.http import HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
 from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
 from .decorators import authentication_required
-
 from api.models import Case
-
 from .interfaces import cases, auth, stats
+from datetime import datetime
 
 
 def login(request: HttpRequest) -> HttpResponse:
@@ -127,14 +125,14 @@ def case_categories(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods({"GET"})
 def medium(request: HttpRequest) -> HttpResponse:
-
     params = request.GET.dict()
-
     try:
-        start_time = params["start_time"]
-        end_time = params["end_time"]
+        start_time_iso = params["start_time"]
+        end_time_iso = params["end_time"]
+        start_time = datetime.fromisoformat(start_time_iso)
+        end_time = datetime.fromisoformat(end_time_iso)
 
-    except KeyError as error:
+    except (KeyError, ValueError) as error:
         return HttpResponse(status=400, content=str(error))
 
     medium_stats = json.dumps(stats.get_medium_count(start_time, end_time))

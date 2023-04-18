@@ -3,7 +3,7 @@ import json
 from django.test import TestCase
 from api.models import Category, Case
 from django.contrib.auth.models import User
-from datetime import datetime
+from datetime import datetime, timezone
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
@@ -294,12 +294,23 @@ class APITests(TestCase):
         self.assertEqual(edited_by_username, "user2")
 
     def test_count_medium(self) -> None:
-
-        end_time = datetime.now()
+        end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
-        print(start_time)
 
-        response = self.client.get(
-            "stats/medium?start_time=&end_time=")
-        print(response)
+        url = ("/api/stats/medium?start_time="+start_time.isoformat()+"&end_time="+\
+              end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        url = ("/api/stats/medium?start_time="+"hallå"+"&end_time="+end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/medium?start_time="+start_time.isoformat()+"&end_time="+"18").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/medium?time_is_starting="+start_time.isoformat()+"&end_time="+\
+              end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
