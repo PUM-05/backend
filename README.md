@@ -185,6 +185,7 @@ Query parameters:
 - `id: int`
 - `time-start: DateTime`
 - `time-end: DateTime`
+- `case-id: int` (case id from their system)
 - `category-id: int`
 - `medium: string`
 - `per-page: int (default 100, set to 0 to disable pages)`
