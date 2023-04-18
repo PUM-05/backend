@@ -9,10 +9,12 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
-    valid_params = {"id", "time-start", "time-end", "category-id", "medium", "per-page", "page"}
+    valid_params = {"id", "case-id", "time-start", "time-end", "category-id", "medium", "per-page",
+                    "page"}
 
     params = {
         "id": "id",
+        "case-id": "case_id",
         "time-start": "created_at__gte",
         "time-end": "created_at__lte",
         "medium": "medium",
@@ -73,8 +75,8 @@ def validate_case(dictionary: Dict) -> None:
     Throws ValueError if any key in the given dictionary is invalid,
     otherwise returns None.
     """
-    list_of_keys = {"notes", "medium", "customer_time",
-                    "additional_time", "form_fill_time", "category_id"}
+    list_of_keys = {"notes", "medium", "customer_time", "additional_time",
+                    "form_fill_time", "category_id", "case_id"}
     for key in dictionary.keys():
         if key not in list_of_keys:
             raise ValueError(f"Unexpected key: {key}.")
@@ -109,17 +111,16 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     Updates a given case with properties from a given dictionary.
     Raises ValueError if dictionary values are not valid.
     """
+
     if "notes" in dictionary:
         case.notes = dictionary.get("notes")
 
-    if "customer_time" in dictionary:
-        case.customer_time = timedelta(seconds=dictionary.get("customer_time") or 0)
+    if "case_id" in dictionary:
+        case.case_id = dictionary.get("case_id")
 
-    if "additional_time" in dictionary:
-        case.additional_time = timedelta(seconds=dictionary.get("additional_time") or 0)
-
-    if "form_fill_time" in dictionary:
-        case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time") or 0)
+    for key in {"customer_time", "additional_time", "form_fill_time"}:
+        if key in dictionary:
+            case.key = timedelta(seconds=dictionary.get(key, 0))
 
     if "medium" in dictionary:
         medium = dictionary.get("medium")
