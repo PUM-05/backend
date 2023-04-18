@@ -86,9 +86,16 @@ class APITests(TestCase):
 
         envManager.add_static_file("index.html")
 
-        response = self.client.get("/does_not_exist")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.getvalue().decode(), "index.html")
+        test_paths = [
+            "/",
+            "/index.html",
+            "/does_not_exist_but_should_return_index",
+        ]
+
+        for path in test_paths:
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.getvalue().decode(), "index.html")
 
     def test_get_root_file(self) -> None:
         """
