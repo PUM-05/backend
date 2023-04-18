@@ -76,7 +76,7 @@ def case(request: HttpRequest) -> HttpResponse:
             new_case.created_by = request.user
             new_case.save()
 
-        except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+        except (JSONDecodeError, UnicodeDecodeError, ValueError, TypeError) as error:
             return HttpResponse(status=400, content=str(error))
 
         return HttpResponse(status=201)
@@ -98,7 +98,7 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
             updated_case.edited_by.add(request.user)
             updated_case.save()
 
-        except (JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+        except (JSONDecodeError, UnicodeDecodeError, ValueError, TypeError) as error:
             return HttpResponse(status=400, content=str(error))
         except Case.DoesNotExist as error:
             return HttpResponse(status=404, content=str(error))
@@ -108,6 +108,8 @@ def case_id(request: HttpRequest, id: int) -> HttpResponse:
     elif request.method == "DELETE":
         try:
             cases.delete_case(id)
+        except TypeError as error:
+            return HttpResponse(status=400, content=str(error))
         except Case.DoesNotExist as error:
             return HttpResponse(status=404, content=str(error))
         return HttpResponse(status=204)
