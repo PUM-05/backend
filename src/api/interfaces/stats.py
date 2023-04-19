@@ -1,5 +1,5 @@
 from api.models import Category, Case
-from datetime import datetime
+from datetime import datetime, time, timedelta, timezone
 from .cases import get_case_categories
 from typing import List, Dict
 
@@ -36,3 +36,20 @@ def gather_stats_per_category(categories: List[Dict], start_time: datetime, end_
         stats.append(category_stat)
 
     return stats
+
+
+def get_stats_per_day(start_time: datetime, end_time: datetime) -> Dict:
+    start_date = start_time.date()
+    end_date = end_time.date()
+    delta = end_date - start_date
+    dates = []
+    for i in range(0, delta.days + 1):
+        day = start_date + timedelta(days=i)
+        day_with_time = datetime(year=day.year, month=day.month, day=day.day, tzinfo=timezone.utc)
+        next_day_with_time = day_with_time + timedelta(days=1)
+        num_cases = Case.objects.filter(
+            created_at__gte=day_with_time, created_at__lte=next_day_with_time, medium="email").count()
+        stat = {day.isoformat():num_cases}
+        dates.append(stat)
+
+    return dates

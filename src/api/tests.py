@@ -326,3 +326,11 @@ class APITests(TestCase):
               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+    def test_stats_per_day(self) -> None:
+        end_time = datetime.now(timezone.utc)
+        start_time = end_time - timedelta(days=7)
+        url = ("/api/stats/day?start_time="+start_time.isoformat()+"&end_time="+\
+              end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
