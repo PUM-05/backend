@@ -137,3 +137,19 @@ def medium(request: HttpRequest) -> HttpResponse:
 
     medium_stats = json.dumps(stats.get_medium_count(start_time, end_time))
     return HttpResponse(medium_stats, content_type="application/json", status=200)
+
+
+@require_http_methods({"GET"})
+def stats_per_category(request: HttpRequest) -> HttpResponse:
+    params = request.GET.dict()
+    try:
+        start_time_iso = params["start_time"]
+        end_time_iso = params["end_time"]
+        start_time = datetime.fromisoformat(start_time_iso)
+        end_time = datetime.fromisoformat(end_time_iso)
+
+    except (KeyError, ValueError) as error:
+        return HttpResponse(status=400, content=str(error))
+
+    stats_per_category = json.dumps(stats.get_stats_per_category(start_time, end_time))
+    return HttpResponse(stats_per_category, content_type="application/json", status=200)

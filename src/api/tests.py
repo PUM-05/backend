@@ -25,6 +25,9 @@ class APITests(TestCase):
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20), notes="This is a note.",
                             customer_time=timedelta(seconds=90), category_id=3)
+        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
+                            additional_time=timedelta(seconds=20), notes="Johannes did nothing wrong.",
+                            customer_time=timedelta(seconds=90), category_id=6)
 
         user1 = User.objects.create(username="user1")
         user1.set_password("")
@@ -159,7 +162,7 @@ class APITests(TestCase):
         data = json.loads(content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(data), 3)
+        self.assertEqual(len(data), 4)
         self.assertEqual(data[0]["medium"], None)
         self.assertEqual(data[1]["medium"], "phone")
         self.assertEqual(data[2]["medium"], "email")
@@ -314,3 +317,12 @@ class APITests(TestCase):
               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
+
+    def test_stats_per_category(self) -> None:
+        end_time = datetime.now(timezone.utc)
+        start_time = end_time - timedelta(days=7)
+
+        url = ("/api/stats/category?start_time="+start_time.isoformat()+"&end_time="+\
+              end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
