@@ -31,7 +31,8 @@ class APITests(TestCase):
                             customer_time=timedelta(seconds=90), category_id=3)
 
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="Johannes did nothing wrong.",
+                            additional_time=timedelta(seconds=20),
+                            notes="Johannes did nothing wrong.",
                             customer_time=timedelta(seconds=90), category_id=6)
 
         user1 = User.objects.create(username="user1")
@@ -305,21 +306,23 @@ class APITests(TestCase):
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
-        url = ("/api/stats/medium?start_time="+start_time.isoformat()+"&end_time="+\
-              end_time.isoformat()).replace("+", "%2B")
+        url = ("/api/stats/medium?start_time=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/medium?start_time="+"hallå"+"&end_time="+end_time.isoformat()).replace("+", "%2B")
+        url = ("/api/stats/medium?start_time=" + "hallå" + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/medium?start_time="+start_time.isoformat()+"&end_time="+"18").replace("+", "%2B")
+        url = ("/api/stats/medium?start_time=" + start_time.isoformat() +
+               "&end_time="+"18").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/medium?time_is_starting="+start_time.isoformat()+"&end_time="+\
-              end_time.isoformat()).replace("+", "%2B")
+        url = ("/api/stats/medium?time_is_starting=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
@@ -327,28 +330,27 @@ class APITests(TestCase):
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
-        url = ("/api/stats/category?start_time="+start_time.isoformat()+"&end_time="+ \
-              end_time.isoformat()).replace("+", "%2B")
+        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/category?start_time=" + "test" + "&end_time=" + end_time.isoformat()).replace("+", "%2B")
+        url = ("/api/stats/category?start_time=" + "test" + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-
-        url = ("/api/stats/category?time_is_starting=" + start_time.isoformat() + "&end_time=" + \
+        url = ("/api/stats/category?time_is_starting=" + start_time.isoformat() + "&end_time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
         end_time = datetime.now(timezone.utc) + timedelta(days=1)
         start_time = end_time + timedelta(days=7)
-        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" + \
+        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
 
     def test_stats_per_day(self) -> None:
         end_time = datetime.today() + timedelta(days=2)
@@ -356,29 +358,29 @@ class APITests(TestCase):
         start_time = end_time - timedelta(days=7)
         delta = str(24 * 60 * 60)
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" + \
+        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
                delta + "&time_periods=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" + \
+        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
                delta + "&time_periods=arne").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/day?art_time=" + start_time.isoformat() + "&delta=" + \
+        url = ("/api/stats/day?art_time=" + start_time.isoformat() + "&delta=" +
                delta + "&time_periods=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
         new_time = datetime.now(timezone.utc) + timedelta(days=1)
-        url = ("/api/stats/day?start_time=" + new_time.isoformat() + "&delta=" + \
+        url = ("/api/stats/day?start_time=" + new_time.isoformat() + "&delta=" +
                delta + "&time_periods=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         delta = str(-24 * 60 * 60)
         url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+","%2B")
+               delta + "&time_periods=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
