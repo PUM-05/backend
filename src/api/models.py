@@ -28,6 +28,11 @@ class Category(models.Model):
         verbose_name_plural = "categories"
 
 
+class Customer(models.Model):
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+
+
 class Case(models.Model):
     notes = models.TextField(null=True)
     medium = models.CharField(max_length=50, null=True)
@@ -37,9 +42,10 @@ class Case(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     edited_at = models.DateTimeField(auto_now=True)
 
-    case_id = models.BigIntegerField(null=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(
+        Customer, on_delete=models.SET_NULL, null=True)
 
     created_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="created_cases")
