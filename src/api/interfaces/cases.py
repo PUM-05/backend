@@ -1,6 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any, Dict, List
-
 from api.models import Category, Case
 
 

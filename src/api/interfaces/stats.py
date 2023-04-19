@@ -1,5 +1,6 @@
 from api.models import Category, Case
-from datetime import datetime, time, timedelta, timezone
+from django.db.models import Sum
+from datetime import datetime, timedelta
 from .cases import get_case_categories
 from typing import List, Dict
 
@@ -20,36 +21,43 @@ def get_stats_per_category(start_time: datetime, end_time: datetime) -> Dict:
 
 
 def gather_stats_per_category(categories: List[Dict], start_time: datetime, end_time: datetime) -> List[Dict]:
-    stats = []
+    result = []
+    time_fields = {"customer_time": 0, "additional_time": 0, "form_fill_time": 0}
     for category in categories:
-        num_cases = Case.objects.filter(created_at__gte=start_time, created_at__lte=end_time,
-                                        category_id=category["id"]).count()
-        subcategory_stats = []
-        if ("subcategories" in category) and (category["subcategories"] is not None):
-            subcategories = category["subcategories"]
-            subcategory_stats = gather_stats_per_category(subcategories, start_time, end_time)
+        stat = {"category_id":category["id"], "category_name":category["name"]}
 
-        category_stat = {"id":category["id"], # input_time? initial_time? extra_time? total_time? what does it all mean?
-                         "name":category["name"],
-                         "count":num_cases,
-                         "subcategories":subcategory_stats}
-        stats.append(category_stat)
+        cases = Case.objects.filter(created_at__gte=start_time, created_at__lte=end_time,
+                                    category_id=category["id"])
+        stat["count"] = cases.count()
 
-    return stats
+        for key in time_fields:
+            time_sum = cases.aggregate(sum=Sum(key))["sum"]
+            if time_sum is not None:
+                time_fields[key] = time_sum.total_seconds()
+            stat[key] = time_fields[key]
+
+        if category.get("subcategories") is not None:
+            stat["subcategories"] = gather_stats_per_category(category["subcategories"], start_time, end_time)
+            for substat in stat["subcategories"]:
+                stat["count"] += substat["count"]
+                for key in time_fields:
+                    time_fields[key] += stat.get(key)
+
+        result.append(stat)
+
+    return result
 
 
-def get_stats_per_day(start_time: datetime, end_time: datetime) -> Dict:
-    start_date = start_time.date()
-    end_date = end_time.date()
-    delta = end_date - start_date
+def get_stats_per_day(start_time: datetime, delta: timedelta, time_periods: int) -> Dict:
     dates = []
-    for i in range(0, delta.days + 1):
-        day = start_date + timedelta(days=i)
-        day_with_time = datetime(year=day.year, month=day.month, day=day.day, tzinfo=timezone.utc)
-        next_day_with_time = day_with_time + timedelta(days=1)
-        num_cases = Case.objects.filter(
-            created_at__gte=day_with_time, created_at__lte=next_day_with_time, medium="email").count()
-        stat = {day.isoformat():num_cases}
+    for i in range(time_periods):
+        start = start_time + delta*i
+        end = start + delta
+        if delta.seconds < 0:
+            num_cases = Case.objects.filter(created_at__gte=end, created_at__lte=start).count()
+        else:
+            num_cases = Case.objects.filter(created_at__gte=start, created_at__lte=end).count()
+        stat = {"start":start.isoformat(), "end":end.isoformat(), "count":num_cases}
         dates.append(stat)
 
     return dates

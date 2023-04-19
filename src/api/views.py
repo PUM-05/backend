@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from .decorators import authentication_required
 from api.models import Case
 from .interfaces import cases, auth, stats
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 def login(request: HttpRequest) -> HttpResponse:
@@ -160,12 +160,12 @@ def stats_per_day(request: HttpRequest) -> HttpResponse:
     params = request.GET.dict()
     try:
         start_time_iso = params["start_time"]
-        end_time_iso = params["end_time"]
         start_time = datetime.fromisoformat(start_time_iso)
-        end_time = datetime.fromisoformat(end_time_iso)
+        delta = timedelta(seconds=int(params["delta"]))
+        time_periods = int(params["time_periods"])
 
     except (KeyError, ValueError) as error:
         return HttpResponse(status=400, content=str(error))
 
-    stats_per_day = json.dumps(stats.get_stats_per_day(start_time, end_time))
+    stats_per_day = json.dumps(stats.get_stats_per_day(start_time, delta, time_periods))
     return HttpResponse(stats_per_day, content_type="application/json", status=200)
