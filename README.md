@@ -298,7 +298,7 @@ Status: 200 (OK)
 ```
 
 ## Statistics
-### Medium
+### Statistics per medium
 Returns the number of cases for each medium in the given time period.
 If a start or end date is not specified, the time period will be set to the beginning or end of time respectively.
 
@@ -322,12 +322,76 @@ Status: 200 (OK)
 
 [
     {
-        "medium": "phone",
-        "count": 5
+        "medium": string,
+        "count": int
     },
     {
-        "medium": "email",
-        "count": 12
+        "medium": string,
+        "count": int
+    },
+]
+```
+
+### Statistics per category
+Returns data about each category in the given time period.
+
+Query parameters:
+- `start: DateTime`
+- `end: DateTime`
+
+Request:
+``` http
+GET /api/stats/categories?<query>
+```
+
+Success response:
+``` http
+Status: 200 (OK)
+
+[
+    {
+        category_id: int,
+        category_name: string,
+        count: int,
+        customer_time: int (seconds),
+        additional_time: int (seconds),
+        form_fill_time: int (seconds),
+        subcategories: [
+            {
+                category_id: int,
+                category_name: string,
+                count: int,
+                customer_time: int (seconds),
+                additional_time: int (seconds),
+                form_fill_time: int (seconds)
+            },
+        ]
+    },
+]
+```
+
+### Time Periods
+Returns a list with the number of cases for each interval in the given time period. Positive values for `interval-length` will result in intervals that begin at the given `start` time. Negative interval lengths will result in intervals that end at the given `start` time. 
+
+Query parameters:
+- `start: DateTime`
+- `interval-length: int (seconds)`
+- `intervals: int`
+
+Request:
+``` http
+GET /api/stats/time-periods?<query>
+```
+
+Success response:
+``` http
+Status: 200 (OK)
+
+[
+    {
+        "start": "yyyy-mm-ddThh:mm:ssZ",
+        "end": "yyyy-mm-ddThh:mm:ssZ",
+        "count": int
     },
 ]
 ```
