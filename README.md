@@ -132,17 +132,17 @@ POST /api/login/
     "password": "<password>"
 }
 ```
-Success:
-``` http
+Success response:
+``` smalltalk
 Status: 204 (No Content)
 Set-Cookie: sessionid=...
 ```
-The username was valid, but a password is also required and wasn't provided in the request:
-``` http
+The username was valid, but a password is also required and wasn't provided in the request (response):
+``` smalltalk
 Status: 403 (Forbidden)
 ```
-Wrong username or password:
-``` http
+Wrong username or password (response):
+``` smalltalk
 Status: 401 (Unauthorized)
 ```
 
@@ -155,7 +155,7 @@ POST /api/logout/
 Cookie: sessionid=...
 ```
 Success response:
-``` http
+``` smalltalk
 Status: 204 (No Content)
 ```
 
@@ -168,11 +168,11 @@ GET /api/check/
 Cookie: sessionid=...
 ```
 Response if logged in:
-``` http
+``` smalltalk
 Status: 204 (No Content)
 ```
 Response if not logged in:
-``` http
+``` smalltalk
 Status: 401 (Unauthorized)
 ```
 
@@ -192,7 +192,7 @@ GET /api/case/
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 200 (OK)
 
 [
@@ -228,7 +228,7 @@ POST /api/case/
 }
 ```
 Success response:
-``` http
+``` smalltalk
 Status: 201 (Created)
 ```
 
@@ -251,7 +251,7 @@ PATCH /api/case/<id>/
 }
 ```
 Success response:
-``` http
+``` smalltalk
 Status: 204 (No Content)
 ```
 
@@ -264,7 +264,7 @@ DELETE /api/case/<id>/
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 204 (No Content)
 ```
 
@@ -277,7 +277,7 @@ GET /api/categories/
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 200 (OK)
 
 [
@@ -303,8 +303,8 @@ Returns the number of cases for each medium in the given time period.
 If a start or end date is not specified, the time period will be set to the beginning or end of time respectively.
 
 Query parameters:
-- `start: DateTime`
-- `end: DateTime`
+- `start: datetime`
+- `end: datetime`
 
 Request:
 ``` http
@@ -317,7 +317,7 @@ GET /api/stats/medium?start=2023-01-01T00:00:00Z&end=2023-12-31T23:59:59Z
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 200 (OK)
 
 [
@@ -336,8 +336,8 @@ Status: 200 (OK)
 Returns data about each category in the given time period.
 
 Query parameters:
-- `start: DateTime`
-- `end: DateTime`
+- `start: datetime`
+- `end: datetime`
 
 Request:
 ``` http
@@ -345,25 +345,25 @@ GET /api/stats/categories?<query>
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 200 (OK)
 
 [
     {
-        category_id: int,
-        category_name: string,
-        count: int,
-        customer_time: int (seconds),
-        additional_time: int (seconds),
-        form_fill_time: int (seconds),
-        subcategories: [
+        "category_id": int,
+        "category_name": string,
+        "count": int,
+        "customer_time": int (seconds),
+        "additional_time": int (seconds),
+        "form_fill_time": int (seconds),
+        "subcategories": [
             {
-                category_id: int,
-                category_name: string,
-                count: int,
-                customer_time: int (seconds),
-                additional_time: int (seconds),
-                form_fill_time: int (seconds)
+                "category_id": int,
+                "category_name": string,
+                "count": int,
+                "customer_time": int (seconds),
+                "additional_time": int (seconds),
+                "form_fill_time": int (seconds)
             },
         ]
     },
@@ -384,13 +384,13 @@ GET /api/stats/time-periods?<query>
 ```
 
 Success response:
-``` http
+``` smalltalk
 Status: 200 (OK)
 
 [
     {
-        "start": "yyyy-mm-ddThh:mm:ssZ",
-        "end": "yyyy-mm-ddThh:mm:ssZ",
+        "start": datetime,
+        "end": datetime,
         "count": int
     },
 ]
