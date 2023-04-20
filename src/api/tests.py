@@ -215,9 +215,6 @@ class APITests(TestCase):
                 self.assertEqual(data["result_count"], len(data["cases"]))
 
     def test_patch_case(self) -> None:
-        """
-        Tests for patch case.
-        """
         dictionary = {"notes": "new notes"}
 
         response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
