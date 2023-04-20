@@ -196,6 +196,12 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_nested_categories(self) -> None:
+        """
+        Tests nested categories by sending a GET request to the "/api/case/categories" endpoint
+        and verifying that the response status code is 200. Then it parses the JSON content
+        of the response and iterates over all categories and their subcategories, asserting that
+        their "id" and "name" attributes are valid.
+        """
         response = self.client.get("/api/case/categories")
         self.assertEqual(response.status_code, 200)
 
@@ -264,8 +270,8 @@ class APITests(TestCase):
 
     def test_case_created_by_and_edited_by(self) -> None:
         """
-        Tests if we save the user who created a case correctly in the database aswell as if
-        we correctly saves the list of users who has edited the case.
+        Tests if we save the user who created a case correctly in the database and also if
+        we correctly save the list of users who has edited the case.
         """
 
         # --- Login "user1" to create a case ---
@@ -303,6 +309,11 @@ class APITests(TestCase):
         self.assertEqual(edited_by_username, "user2")
 
     def test_count_medium(self) -> None:
+        """
+        Tests the API endpoint /api/stats/medium by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
@@ -327,6 +338,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_stats_per_category(self) -> None:
+        """
+        Tests the API endpoint /api/stats/category by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
@@ -353,6 +369,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_stats_per_day(self) -> None:
+        """
+        Tests the API endpoint /api/stats/day by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
         end_time = datetime.today() + timedelta(days=2)
         end_time = end_time.astimezone(timezone.utc)
         start_time = end_time - timedelta(days=7)

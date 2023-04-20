@@ -125,6 +125,9 @@ def case_categories(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods({"GET"})
 def medium(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the number of cases per medium for a given time range as a JSON array.
+    """
     params = request.GET.dict()
     try:
         start_time_iso = params["start_time"]
@@ -141,6 +144,11 @@ def medium(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods({"GET"})
 def stats_per_category(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the statistics for cases per category and subcategory for a given time range a JSON
+    array.
+    """
+
     params = request.GET.dict()
     try:
         start_time_iso = params["start_time"]
@@ -157,6 +165,9 @@ def stats_per_category(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods({"GET"})
 def stats_per_day(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the number of cases per day for a given time range as a JSON array.
+    """
     params = request.GET.dict()
     try:
         start_time_iso = params["start_time"]

@@ -6,6 +6,9 @@ from typing import List, Dict
 
 
 def get_medium_count(start_time: datetime, end_time: datetime) -> Dict:
+    """
+    Get the count of cases by medium (phone or email) within a given time range.
+    """
     num_email_cases = Case.objects.filter(
         created_at__gte=start_time, created_at__lte=end_time, medium="email").count()
     num_phone_cases = Case.objects.filter(
@@ -15,6 +18,9 @@ def get_medium_count(start_time: datetime, end_time: datetime) -> Dict:
 
 
 def get_stats_per_category(start_time: datetime, end_time: datetime) -> Dict:
+    """
+    Get case-related statistics for each category and its subcategories within a given time range.
+    """
     categories = get_case_categories()
     stats = gather_stats_per_category(categories, start_time, end_time)
     return stats
@@ -22,6 +28,11 @@ def get_stats_per_category(start_time: datetime, end_time: datetime) -> Dict:
 
 def gather_stats_per_category(categories: List[Dict], start_time: datetime,
                               end_time: datetime) -> List[Dict]:
+    """
+    Gather information about cases (category id, category name, total amount of cases, sum of
+    initial time, sum of additional time, sum of form fill time) for each category and its
+    subcategories within a given time range. Function is called recursively for subcategories.
+    """
     result = []
     time_fields = {"customer_time": 0, "additional_time": 0, "form_fill_time": 0}
     for category in categories:
@@ -51,6 +62,10 @@ def gather_stats_per_category(categories: List[Dict], start_time: datetime,
 
 
 def get_stats_per_day(start_time: datetime, delta: timedelta, time_periods: int) -> Dict:
+    """
+    Get the count of cases for each day within a certain time. The length of the time period is
+    decided by delta, and the amount of periods to be checked is decided time_periods.
+    """
     dates = []
     for i in range(time_periods):
         start = start_time + delta*i
