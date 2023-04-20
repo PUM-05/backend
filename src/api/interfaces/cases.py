@@ -1,16 +1,52 @@
 from datetime import timedelta
 from typing import Any, Dict, List
+from django.db.models import Q
 from api.models import Category, Case
 
 
-def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
+def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
     """
     Returns all cases that match the given parameters.
     """
-    # TODO: Implement parameters
+    valid_params = {"id", "time-start", "time-end", "category-id", "medium", "per-page", "page"}
 
-    cases = list(Case.objects.all().values())
-    for case in cases:
+    params = {
+        "id": "id",
+        "time-start": "created_at__gte",
+        "time-end": "created_at__lte",
+        "medium": "medium",
+    }
+
+    for param in parameters:
+        if param not in valid_params:
+            raise ValueError(f"Unexpected parameter: {param}={parameters[param]}.")
+
+    # Builds a query using dict comprehension, which is basically like a mapping function. It
+    # creates a set of queries from the key-value pairs in parameters with the individual queries
+    # looking like "params[key]=value". Only the key-value pairs where key is in params are
+    # included.
+    query = Q(**{params[k]: v for k, v in parameters.items() if k in params.keys()})
+
+    if "category-id" in parameters:
+        try:
+            category = Category.objects.get(id=parameters["category-id"])
+        except Category.DoesNotExist:
+            raise ValueError(f"Category id={parameters['category-id']} does not exist")
+        query &= Q(category=category)
+
+    per_page = int(parameters.get("per-page", 100))
+    page = int(parameters.get("page", 1))
+    start = per_page * (page - 1)
+    end = per_page * page
+
+    if per_page != 0:
+        result = list(Case.objects.filter(query)[start:end + 1].values())
+        has_more = len(result) == per_page + 1
+    else:
+        result = list(Case.objects.filter(query).values())
+        has_more = False
+
+    for case in result:
         # Change all datetimes to seconds
         keys = ["additional_time", "form_fill_time", "customer_time"]
 
@@ -18,7 +54,17 @@ def get_cases(parameters: Dict[str, Any]) -> List[Dict]:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
 
-    return cases
+    result_count = len(result)
+
+    if has_more:
+        result_count -= 1
+        result = result[:-1]
+
+    return {
+        "result_count": result_count,
+        "has_more": has_more,
+        "cases": result,
+    }
 
 
 def validate_case(dictionary: Dict) -> None:
