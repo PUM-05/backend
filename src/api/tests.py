@@ -115,6 +115,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
+        """
+        Test the endpoint for creating a case in the system with correct input values. Iterates 10
+        times, each time creating a case with different input parameters and asserts that the
+        response status code is 201, indicating that the case was created successfully.
+        """
         for i in range(10):
             notes = "notes" + str(i)
             medium = "email" if i % 2 else "phone"
@@ -132,6 +137,11 @@ class APITests(TestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_create_case_incorrect_category(self) -> None:
+        """
+        Test the case creation API endpoint with an incorrect category ID. Sends a
+        POST request to the API with a dictionary containing a set of values, including an incorrect
+        category ID, and asserts that the response status code is 400, indicating a bad request.
+        """
         category = 945
         notes = "notes"
         medium = "email"
@@ -142,6 +152,12 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_create_case_incorrect_medium(self) -> None:
+        """
+        Test the case creation API endpoint with an incorrect medium value. Sends a POST request to
+        the case creation API endpoint with a dictionary that contains an incorrect medium value and
+        checks if the response status code is 400, indicating that the request was unsuccessful due
+        to a bad request.
+        """
         category = 5
         notes = "notes"
         medium = "tiktok"
@@ -215,6 +231,12 @@ class APITests(TestCase):
                 self.assertEqual(data["result_count"], len(data["cases"]))
 
     def test_patch_case(self) -> None:
+        """
+        Test the ability to update a case using PATCH request. Tests that the endpoint returns 204
+        when successful, and that the note field is updated correctly in the database. Also tests
+        that a 404 is returned when attempting to update a non-existing case, and that a 400 error
+        is returned when trying to update a case with an invalid field or value.
+        """
         dictionary = {"notes": "new notes"}
 
         response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)

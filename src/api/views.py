@@ -148,7 +148,6 @@ def stats_per_category(request: HttpRequest) -> HttpResponse:
     Returns the statistics for cases per category and subcategory for a given time range a JSON
     array.
     """
-
     params = request.GET.dict()
     try:
         start_time_iso = params["start_time"]
