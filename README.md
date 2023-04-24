@@ -20,6 +20,11 @@ __Table of Contents__
     + [Update case](#update-case)
     + [Delete case](#delete-case)
     + [Get categories](#get-categories)
+  * [Statistics](#statistics)
+    + [Statistics per medium](#statistics-per-medium)
+    + [Statistics per category](#statistics-per-category)
+    + [Time Periods](#time-periods)
+
 
 # Setup
 
