@@ -50,7 +50,8 @@ class Case(models.Model):
         """
         Override save() to also set category_name based on category
         """
-        self.category_name = self.category.name
+        if self.category:
+            self.category_name = self.category.name
         super(Case, self).save(*args, **kwargs)
 
     class Meta:
