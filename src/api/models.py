@@ -40,11 +40,18 @@ class Case(models.Model):
     case_id = models.BigIntegerField(null=True)
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, null=True)
-
+    category_name = models.CharField(max_length=50, null=True)
     created_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, related_name="created_cases")
     edited_by = models.ManyToManyField(
         User, related_name="edited_cases")
+
+    def save(self, *args, **kwargs) -> None:
+        """
+        Override save() to also set category_name based on category
+        """
+        self.category_name = self.category.name
+        super(Case, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-created_at', '-id']
