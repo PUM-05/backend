@@ -426,29 +426,29 @@ class APITests(TestCase):
         start_time = end_time - timedelta(days=7)
         delta = str(24 * 60 * 60)
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
+        url = ("/api/stats/periods?start-time=" + start_time.isoformat() + "&delta=" +
+               delta + "&intervals=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=arne").replace("+", "%2B")
+        url = ("/api/stats/periods?start-time=" + start_time.isoformat() + "&delta=" +
+               delta + "&intervals=arne").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/day?art_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
+        url = ("/api/stats/periods?wrong=" + start_time.isoformat() + "&delta=" +
+               delta + "&intervals=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
         new_time = datetime.now(timezone.utc) + timedelta(days=1)
-        url = ("/api/stats/day?start_time=" + new_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
+        url = ("/api/stats/periods?start-time=" + new_time.isoformat() + "&delta=" +
+               delta + "&intervals=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         delta = str(-24 * 60 * 60)
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
+        url = ("/api/stats/periods?start-time=" + start_time.isoformat() + "&delta=" +
+               delta + "&intervals=7").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

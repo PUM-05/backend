@@ -355,7 +355,7 @@ Query parameters:
 
 Request:
 ``` http
-GET /api/stats/categories?<query>
+GET /api/stats/category?<query>
 ```
 
 Success response:
@@ -385,16 +385,21 @@ Status: 200 (OK)
 ```
 
 ### Time Periods
-Returns a list with the number of cases for each interval in the given time period. Positive values for `interval-length` will result in intervals that begin at the given `start` time. Negative interval lengths will result in intervals that end at the given `start` time. 
+Returns a list with the number of cases for each interval in the given time period. Positive values for `delta` will result in intervals that begin at the given `start-time`. Negative values for `delta` will result in intervals that end at the given `start-time`. 
 
 Query parameters:
-- `start: DateTime`
-- `interval-length: int (seconds)`
-- `intervals: int`
+- `start-time: DateTime`
+- `delta: int (seconds)`
+- `intervals: int (number of intervals to include)`
 
 Request:
 ``` http
-GET /api/stats/time-periods?<query>
+GET /api/stats/periods?<query>
+```
+Example:
+> Returns the number of cases for each hour on january 1 2023:
+``` http
+GET /api/stats/periods?start-time=2023-01-01T00:00:00Z&delta=3600&intervals=24
 ```
 
 Success response:
@@ -407,5 +412,6 @@ Status: 200 (OK)
         "end": datetime,
         "count": int
     },
+    ...
 ]
 ```

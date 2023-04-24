@@ -61,9 +61,9 @@ def gather_stats_per_category(categories: List[Dict], start_time: datetime,
     return result
 
 
-def get_stats_per_day(start_time: datetime, delta: timedelta, time_periods: int) -> Dict:
+def get_stats_per_period(start_time: datetime, delta: timedelta, time_periods: int) -> Dict:
     """
-    Get the count of cases for each day within a certain time. The length of the time period is
+    Get the count of cases for each time period in the given interval. The length of the time period is
     decided by delta, and the amount of periods to be checked is decided time_periods.
     """
     dates = []

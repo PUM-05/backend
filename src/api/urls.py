@@ -10,6 +10,5 @@ urlpatterns = [
     path('case/categories', views.case_categories),
     path('stats/medium', views.medium),
     path('stats/category', views.stats_per_category),
-    path('stats/day', views.stats_per_day)
-
+    path('stats/periods', views.stats_per_period)
 ]
