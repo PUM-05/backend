@@ -9,6 +9,8 @@ from datetime import datetime, timezone
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
 LOGOUT_PATH = "/api/logout"
+LOGIN_PATH = "/api/login"
+CHECK_PATH = "/api/check"
 
 
 class APITests(TestCase):
@@ -52,12 +54,12 @@ class APITests(TestCase):
         Tests that the login endpoint returns a 204 status code and a session
         cookie when the login is successful.
         """
-        response = self.client.post("/api/login", {"username": "user1"},
+        response = self.client.post(LOGIN_PATH, {"username": "user1"},
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertTrue(len(response.cookies["sessionid"].value) > 0)
 
-        response = self.client.post("/api/login", {"username": "user2", "password": "password2"},
+        response = self.client.post(LOGIN_PATH, {"username": "user2", "password": "password2"},
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertTrue(len(response.cookies["sessionid"].value) > 0)
@@ -67,19 +69,19 @@ class APITests(TestCase):
         Tests that the login endpoint returns a 401 status code when the login
         is unsuccessful.
         """
-        response = self.client.post("/api/login", {"username": "user1", "password": "wrong"},
+        response = self.client.post(LOGIN_PATH, {"username": "user1", "password": "wrong"},
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
-        response = self.client.post("/api/login", {"username": "user2"},
+        response = self.client.post(LOGIN_PATH, {"username": "user2"},
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 403)
 
-        response = self.client.post("/api/login", {"username": "wrong"},
+        response = self.client.post(LOGIN_PATH, {"username": "wrong"},
                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 401)
 
-        response = self.client.post("/api/login")
+        response = self.client.post(LOGIN_PATH)
         self.assertEqual(response.status_code, 400)
 
     def test_logout(self) -> None:
@@ -87,16 +89,16 @@ class APITests(TestCase):
         Tests that the logout endpoint returns a 204 status code when the user
         is logged in and a 401 status code when the user is not logged in.
         """
-        self.client.get(LOGOUT_PATH)   # Logout due to login in SetUp
+        self.client.post(LOGOUT_PATH)   # Logout due to login in SetUp
 
-        response = self.client.get(LOGOUT_PATH)
+        response = self.client.post(LOGOUT_PATH)
         self.assertEqual(response.status_code, 401)
 
         self.client.login(username="user1", password="")
 
-        response = self.client.get(LOGOUT_PATH)
+        response = self.client.post(LOGOUT_PATH)
         self.assertEqual(response.status_code, 204)
-        response = self.client.get("/api/check")
+        response = self.client.post(CHECK_PATH)
         self.assertEqual(response.status_code, 401)
 
     def test_check(self) -> None:
@@ -106,12 +108,12 @@ class APITests(TestCase):
         """
         self.client.get(LOGOUT_PATH)  # Logout due to login in SetUp
 
-        response = self.client.get("/api/check")
+        response = self.client.get(CHECK_PATH)
         self.assertEqual(response.status_code, 401)
 
         self.client.login(username="user1", password="")
 
-        response = self.client.get("/api/check")
+        response = self.client.get(CHECK_PATH)
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
@@ -127,10 +129,10 @@ class APITests(TestCase):
             form_fill_time = i
             additional_time = i + 1
             category = (i % 5) + 1
-
+            case_id = i
             dictionary = {"notes": notes, "medium": medium, "customer_time": customer_time,
                           "form_fill_time": form_fill_time, "additional_time": additional_time,
-                          "category_id": category}
+                          "category_id": category, "case_id": case_id}
 
             response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
@@ -324,7 +326,7 @@ class APITests(TestCase):
         # --- Login "user1" to create a case done in SetUp ---
         note = "This note is used to test created by and edited by."
         dictionary = {"notes": note}
-        response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
+        self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
 
         # --- Find the ID of the case we just created ---
         cases = Case.objects.all()
@@ -337,8 +339,7 @@ class APITests(TestCase):
         # --- Login "user2" to edit the case we just created ---
         self.client.login(username="user2", password="password2")
         dictionary = {"notes": "it works!"}
-        response = self.client.patch(
-            CASE_PATH + f"/{case_id}", dictionary, content_type=CONTENT_TYPE_JSON)
+        self.client.patch(CASE_PATH + f"/{case_id}", dictionary, content_type=CONTENT_TYPE_JSON)
 
         # --- Get a list of all users that have edited the case ---
         edited_by = []
