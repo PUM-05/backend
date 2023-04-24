@@ -45,13 +45,16 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
         result = list(Case.objects.filter(query)[start:end + 1].values())
         has_more = len(result) == per_page + 1
     else:
-        result = list(Case.objects.filter(query).values())
+        result = cases = list(Case.objects.filter(query).values())
         has_more = False
 
     for case in result:
-        # Change all datetimes to seconds
+        # Change all datetimes to seconds and add category name
         keys = ["additional_time", "form_fill_time", "customer_time"]
-
+        try:
+            case["category_name"] = Category.objects.get(id=case["category_id"]).name
+        except Category.DoesNotExist:
+            case["category_name"] = None
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()
