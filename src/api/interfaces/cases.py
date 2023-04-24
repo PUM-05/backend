@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any, Dict, List
 from django.db.models import Q
-
 from api.models import Category, Case
 
 

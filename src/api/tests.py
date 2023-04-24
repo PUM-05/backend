@@ -4,6 +4,7 @@ import json
 from django.test import TestCase
 from api.models import Category, Case
 from django.contrib.auth.models import User
+from datetime import datetime, timezone
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
@@ -28,6 +29,15 @@ class APITests(TestCase):
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20), notes="This is a note.",
                             customer_time=timedelta(seconds=90), category_id=3)
+
+        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
+                            additional_time=timedelta(seconds=20), notes="This is a note.",
+                            customer_time=timedelta(seconds=90), category_id=3)
+
+        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
+                            additional_time=timedelta(seconds=20),
+                            notes="Johannes did nothing wrong.",
+                            customer_time=timedelta(seconds=90), category_id=6)
 
         user1 = User.objects.create(username="user1")
         user1.set_password("")
@@ -79,7 +89,6 @@ class APITests(TestCase):
         Tests that the logout endpoint returns a 204 status code when the user
         is logged in and a 401 status code when the user is not logged in.
         """
-
         self.client.post(LOGOUT_PATH)   # Logout due to login in SetUp
 
         response = self.client.post(LOGOUT_PATH)
@@ -97,7 +106,6 @@ class APITests(TestCase):
         Tests that the check endpoint returns a 204 status code when the user is
         logged in and a 401 status code when the user is not logged in.
         """
-
         self.client.get(LOGOUT_PATH)  # Logout due to login in SetUp
 
         response = self.client.get(CHECK_PATH)
@@ -109,7 +117,11 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
-
+        """
+        Test the endpoint for creating a case in the system with correct input values. Iterates 10
+        times, each time creating a case with different input parameters and asserts that the
+        response status code is 201, indicating that the case was created successfully.
+        """
         for i in range(10):
             notes = "notes" + str(i)
             medium = "email" if i % 2 else "phone"
@@ -127,7 +139,11 @@ class APITests(TestCase):
             self.assertEqual(response.status_code, 201)
 
     def test_create_case_incorrect_category(self) -> None:
-
+        """
+        Test the case creation API endpoint with an incorrect category ID. Sends a
+        POST request to the API with a dictionary containing a set of values, including an incorrect
+        category ID, and asserts that the response status code is 400, indicating a bad request.
+        """
         category = 945
         notes = "notes"
         medium = "email"
@@ -138,7 +154,12 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_create_case_incorrect_medium(self) -> None:
-
+        """
+        Test the case creation API endpoint with an incorrect medium value. Sends a POST request to
+        the case creation API endpoint with a dictionary that contains an incorrect medium value and
+        checks if the response status code is 400, indicating that the request was unsuccessful due
+        to a bad request.
+        """
         category = 5
         notes = "notes"
         medium = "tiktok"
@@ -157,10 +178,11 @@ class APITests(TestCase):
         data = json.loads(content)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["result_count"], 3)
-        self.assertEqual(data["cases"][2]["medium"], None)
-        self.assertEqual(data["cases"][1]["medium"], "phone")
-        self.assertEqual(data["cases"][0]["medium"], "email")
+        self.assertEqual(data["result_count"], 5)
+        self.assertEqual(data["cases"][4]["medium"], None)
+        self.assertEqual(data["cases"][3]["medium"], "phone")
+        self.assertEqual(data["cases"][2]["medium"], "email")
+        self.assertEqual(data["cases"][0]["notes"], "Johannes did nothing wrong.")
 
     def test_get_case_with_parameters(self) -> None:
         """
@@ -183,12 +205,12 @@ class APITests(TestCase):
         parameters = {
             "?id=1": 1,
             "?category-id=2": 6,
-            "?medium=email": 6,
+            "?medium=email": 7,
             "?medium=email&category-id=2": 3,
-            "?time-start=2019-01-01 00:00:00Z": 13,
-            "?time-end=2024-02-02 00:00:00Z": 13,
+            "?time-start=2019-01-01 00:00:00Z": 15,
+            "?time-end=2024-02-02 00:00:00Z": 15,
             "?per-page=2": 2,
-            "?per-page=0": 13,
+            "?per-page=0": 15,
             "?id=87": 0,
             "?category-id=hej": -1,
             "?category-id=12": -1,
@@ -211,7 +233,12 @@ class APITests(TestCase):
                 self.assertEqual(data["result_count"], len(data["cases"]))
 
     def test_patch_case(self) -> None:
-
+        """
+        Test the ability to update a case using PATCH request. Tests that the endpoint returns 204
+        when successful, and that the note field is updated correctly in the database. Also tests
+        that a 404 is returned when attempting to update a non-existing case, and that a 400 error
+        is returned when trying to update a case with an invalid field or value.
+        """
         dictionary = {"notes": "new notes"}
 
         response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
@@ -229,6 +256,12 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_nested_categories(self) -> None:
+        """
+        Tests nested categories by sending a GET request to the "/api/case/categories" endpoint
+        and verifying that the response status code is 200. Then it parses the JSON content
+        of the response and iterates over all categories and their subcategories, asserting that
+        their "id" and "name" attributes are valid.
+        """
         response = self.client.get("/api/case/categories")
         self.assertEqual(response.status_code, 200)
 
@@ -254,7 +287,6 @@ class APITests(TestCase):
         and deleted, as well as if the number of cases have changed and if querying a
         deleted object will result in an error.
         """
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/1", content_type=CONTENT_TYPE_JSON)
@@ -274,7 +306,6 @@ class APITests(TestCase):
         with an incorrect id when trying to make a delete request, as well as if the
         number of cases remain the same.
         """
-
         no_cases_before = len(Case.objects.all())
 
         response = self.client.delete(CASE_PATH + "/128", content_type=CONTENT_TYPE_JSON)
@@ -289,10 +320,9 @@ class APITests(TestCase):
 
     def test_case_created_by_and_edited_by(self) -> None:
         """
-        Tests if we save the user who created a case correctly in the database as well as if
+        Tests if we save the user who created a case correctly in the database and also if
         we correctly save the list of users who has edited the case.
         """
-
         # --- Login "user1" to create a case done in SetUp ---
         note = "This note is used to test created by and edited by."
         dictionary = {"notes": note}
@@ -324,3 +354,101 @@ class APITests(TestCase):
         edited_by_username = str(edited_by[0])
         self.assertEqual(len(edited_by), 1)
         self.assertEqual(edited_by_username, "user2")
+
+    def test_count_medium(self) -> None:
+        """
+        Tests the API endpoint /api/stats/medium by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
+        end_time = datetime.now(timezone.utc)
+        start_time = end_time - timedelta(days=7)
+
+        url = ("/api/stats/medium?start_time=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = ("/api/stats/medium?start_time=" + "hallå" + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/medium?start_time=" + start_time.isoformat() +
+               "&end_time="+"18").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/medium?time_is_starting=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+    def test_stats_per_category(self) -> None:
+        """
+        Tests the API endpoint /api/stats/category by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
+        end_time = datetime.now(timezone.utc)
+        start_time = end_time - timedelta(days=7)
+
+        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = ("/api/stats/category?start_time=" + "test" + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/category?time_is_starting=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        end_time = datetime.now(timezone.utc) + timedelta(days=1)
+        start_time = end_time + timedelta(days=7)
+        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
+               end_time.isoformat()).replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+    def test_stats_per_day(self) -> None:
+        """
+        Tests the API endpoint /api/stats/day by making various requests with different
+        parameters to the endpoint with various inputs and asserting that the response status code
+        is as expected.
+        """
+        end_time = datetime.today() + timedelta(days=2)
+        end_time = end_time.astimezone(timezone.utc)
+        start_time = end_time - timedelta(days=7)
+        delta = str(24 * 60 * 60)
+
+        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
+               delta + "&time_periods=7").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
+               delta + "&time_periods=arne").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        url = ("/api/stats/day?art_time=" + start_time.isoformat() + "&delta=" +
+               delta + "&time_periods=7").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+
+        new_time = datetime.now(timezone.utc) + timedelta(days=1)
+        url = ("/api/stats/day?start_time=" + new_time.isoformat() + "&delta=" +
+               delta + "&time_periods=7").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        delta = str(-24 * 60 * 60)
+        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
+               delta + "&time_periods=7").replace("+", "%2B")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)

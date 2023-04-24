@@ -4,10 +4,9 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 from json.decoder import JSONDecodeError
 from .decorators import authentication_required
-
 from api.models import Case
-
-from .interfaces import cases, auth
+from .interfaces import cases, auth, stats
+from datetime import datetime, timedelta
 
 
 def login(request: HttpRequest) -> HttpResponse:
@@ -122,3 +121,61 @@ def case_categories(request: HttpRequest) -> HttpResponse:
     """
     categories_json = json.dumps(cases.get_case_categories())
     return HttpResponse(categories_json, content_type="application/json", status=200)
+
+
+@require_http_methods({"GET"})
+def medium(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the number of cases per medium for a given time range as a JSON array.
+    """
+    params = request.GET.dict()
+    try:
+        start_time_iso = params["start_time"]
+        end_time_iso = params["end_time"]
+        start_time = datetime.fromisoformat(start_time_iso)
+        end_time = datetime.fromisoformat(end_time_iso)
+
+    except (KeyError, ValueError) as error:
+        return HttpResponse(status=400, content=str(error))
+
+    medium_stats = json.dumps(stats.get_medium_count(start_time, end_time))
+    return HttpResponse(medium_stats, content_type="application/json", status=200)
+
+
+@require_http_methods({"GET"})
+def stats_per_category(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the statistics for cases per category and subcategory for a given time range a JSON
+    array.
+    """
+    params = request.GET.dict()
+    try:
+        start_time_iso = params["start_time"]
+        end_time_iso = params["end_time"]
+        start_time = datetime.fromisoformat(start_time_iso)
+        end_time = datetime.fromisoformat(end_time_iso)
+
+    except (KeyError, ValueError) as error:
+        return HttpResponse(status=400, content=str(error))
+
+    stats_per_category = json.dumps(stats.get_stats_per_category(start_time, end_time))
+    return HttpResponse(stats_per_category, content_type="application/json", status=200)
+
+
+@require_http_methods({"GET"})
+def stats_per_day(request: HttpRequest) -> HttpResponse:
+    """
+    Returns the number of cases per day for a given time range as a JSON array.
+    """
+    params = request.GET.dict()
+    try:
+        start_time_iso = params["start_time"]
+        start_time = datetime.fromisoformat(start_time_iso)
+        delta = timedelta(seconds=int(params["delta"]))
+        time_periods = int(params["time_periods"])
+
+    except (KeyError, ValueError) as error:
+        return HttpResponse(status=400, content=str(error))
+
+    stats_per_day = json.dumps(stats.get_stats_per_day(start_time, delta, time_periods))
+    return HttpResponse(stats_per_day, content_type="application/json", status=200)
