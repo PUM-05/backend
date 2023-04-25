@@ -4,30 +4,7 @@ from api.models import Category, Case
 from datetime import datetime, timezone
 
 
-class CasesTests(TestCase):
-
-    def setUp(self) -> None:
-        Category.objects.create(name="category1")
-        p = Category.objects.create(name="category2")
-        Category.objects.create(name="subcategory21", parent=p)
-        Category.objects.create(name="subcategory22", parent=p)
-
-        Case.objects.create()
-        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
-        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
-                            customer_time=timedelta(seconds=90), category_id=1)
-
-        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is another note.",
-                            customer_time=timedelta(seconds=90), category_id=1)
-
-        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20),
-                            customer_time=timedelta(seconds=90), category_id=3)
-
-        # The setup above is not actually needed for the tests to work, but I'm keeping it in case
-        # we want to expand the tests!
+class StatsTests(TestCase):
 
     def test_count_medium(self) -> None:
         """
