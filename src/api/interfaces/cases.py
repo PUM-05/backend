@@ -119,9 +119,14 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     if "case_id" in dictionary:
         case.case_id = dictionary.get("case_id")
 
-    for key in {"customer_time", "additional_time", "form_fill_time"}:
-        if key in dictionary:
-            case.key = timedelta(seconds=dictionary.get(key, 0))
+    if "customer_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary.get("customer_time", 0))
+
+    if "additional_time" in dictionary:
+        case.additional_time = timedelta(seconds=dictionary.get("additional_time", 0))
+
+    if "form_fill_time" in dictionary:
+        case.form_fill_time = timedelta(seconds=dictionary.get("form_fill_time", 0))
 
     if "medium" in dictionary:
         medium = dictionary.get("medium")
