@@ -113,7 +113,6 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     Updates a given case with properties from a given dictionary.
     Raises ValueError if dictionary values are not valid.
     """
-
     if "notes" in dictionary:
         case.notes = dictionary.get("notes")
 
