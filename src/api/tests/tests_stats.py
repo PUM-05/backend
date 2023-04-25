@@ -8,38 +8,27 @@ from datetime import datetime, timezone
 class CasesTests(TestCase):
 
     def setUp(self) -> None:
-        Category.objects.create(name="test1")
-        Category.objects.create(name="test2")
-        Category.objects.create(name="test3")
-        Category.objects.create(name="test4")
-        p = Category.objects.create(name="test5")
-        Category.objects.create(name="test51", parent=p)
-        Category.objects.create(name="test52", parent=p)
+        Category.objects.create(name="category1")
+        p = Category.objects.create(name="category2")
+        Category.objects.create(name="subcategory21", parent=p)
+        Category.objects.create(name="subcategory22", parent=p)
 
         Case.objects.create()
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20), notes="This is a note.",
-                            customer_time=timedelta(seconds=90), category_id=3)
+                            customer_time=timedelta(seconds=90), category_id=1)
 
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
-                            customer_time=timedelta(seconds=90), category_id=3)
+                            additional_time=timedelta(seconds=20), notes="This is another note.",
+                            customer_time=timedelta(seconds=90), category_id=1)
 
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20),
-                            notes="Johannes did nothing wrong.",
-                            customer_time=timedelta(seconds=90), category_id=6)
+                            customer_time=timedelta(seconds=90), category_id=3)
 
-        user1 = User.objects.create(username="user1")
-        user1.set_password("")
-        user1.save()
-        user2 = User.objects.create(username="user2")
-        user2.set_password("password2")
-        user2.save()
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
+        # The setup above is not actually needed for the tests to work, but I'm keeping it in case
+        # we want to expand the tests!
 
     def test_count_medium(self) -> None:
         """
@@ -52,7 +41,7 @@ class CasesTests(TestCase):
         url_begin = "/api/stats/medium?start-time="
 
         urls = {url_begin + start + "&end-time=" + end: 200,
-                url_begin + "hallå" + "&end-time=" + end: 400,
+                url_begin + "incorrect" + "&end-time=" + end: 400,
                 url_begin + start + "&end-time=" + "18": 400,
                 "/api/stats/medium?time-is-starting=" + start + "&end-time=" + end: 400}
 
@@ -74,7 +63,7 @@ class CasesTests(TestCase):
 
         urls = {url_begin + start + "&end-time=" + end: 200,
                 url_begin + late_start + "&end-time=" + new_end: 200,
-                url_begin + "test" + "&end-time=" + end: 400,
+                url_begin + "incorrect" + "&end-time=" + end: 400,
                 "/api/stats/category?time-is-starting=" + start + "&end-time=" + end: 400}
 
         for url in urls:
@@ -98,7 +87,7 @@ class CasesTests(TestCase):
                 url_begin + late_start + "&delta=" + delta + "&intervals=7": 200,
                 url_begin + start + "&delta=" + neg_delta + "&intervals=7": 200,
                 url_begin + start + "&delta=" + delta + "&intervals=incorrect": 400,
-                "/api/stats/periods?wrong=" + start + "&delta=" + delta + "&intervals=7": 400}
+                "/api/stats/periods?incorrect=" + start + "&delta=" + delta + "&intervals=7": 400}
 
         for url in urls:
             response = self.client.get(url.replace("+", "%2B"))

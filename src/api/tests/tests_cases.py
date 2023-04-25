@@ -11,13 +11,13 @@ CONTENT_TYPE_JSON = "application/json"
 class CasesTests(TestCase):
 
     def setUp(self) -> None:
-        Category.objects.create(name="test1")
-        Category.objects.create(name="test2")
-        Category.objects.create(name="test3")
-        Category.objects.create(name="test4")
-        p = Category.objects.create(name="test5")
-        Category.objects.create(name="test51", parent=p)
-        Category.objects.create(name="test52", parent=p)
+        Category.objects.create(name="category1")
+        Category.objects.create(name="category2")
+        Category.objects.create(name="category3")
+        Category.objects.create(name="category4")
+        p = Category.objects.create(name="category5")
+        Category.objects.create(name="subcategory51", parent=p)
+        Category.objects.create(name="subcategory52", parent=p)
 
         Case.objects.create()
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
@@ -26,12 +26,12 @@ class CasesTests(TestCase):
                             customer_time=timedelta(seconds=90), category_id=3)
 
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
+                            additional_time=timedelta(seconds=20), notes="This is another note.",
                             customer_time=timedelta(seconds=90), category_id=3)
 
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20),
-                            notes="Johannes did nothing wrong.",
+                            notes="This is the last note.",
                             customer_time=timedelta(seconds=90), category_id=6)
 
         user1 = User.objects.create(username="user1")
@@ -110,8 +110,8 @@ class CasesTests(TestCase):
         self.assertEqual(data["cases"][4]["medium"], None)
         self.assertEqual(data["cases"][3]["medium"], "phone")
         self.assertEqual(data["cases"][2]["medium"], "email")
-        self.assertEqual(data["cases"][0]["notes"], "Johannes did nothing wrong.")
-        self.assertEqual(data["cases"][0]["category_name"], "test51")
+        self.assertEqual(data["cases"][0]["notes"], "This is the last note.")
+        self.assertEqual(data["cases"][0]["category_name"], "subcategory51")
 
     def test_get_case_with_parameters(self) -> None:
         """

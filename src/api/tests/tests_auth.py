@@ -12,38 +12,12 @@ CHECK_PATH = "/api/check"
 class AuthTests(TestCase):
 
     def setUp(self) -> None:
-        Category.objects.create(name="test1")
-        Category.objects.create(name="test2")
-        Category.objects.create(name="test3")
-        Category.objects.create(name="test4")
-        p = Category.objects.create(name="test5")
-        Category.objects.create(name="test51", parent=p)
-        Category.objects.create(name="test52", parent=p)
-
-        Case.objects.create()
-        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
-        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
-                            customer_time=timedelta(seconds=90), category_id=3)
-
-        Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
-                            customer_time=timedelta(seconds=90), category_id=3)
-
-        Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20),
-                            notes="Johannes did nothing wrong.",
-                            customer_time=timedelta(seconds=90), category_id=6)
-
         user1 = User.objects.create(username="user1")
         user1.set_password("")
         user1.save()
         user2 = User.objects.create(username="user2")
         user2.set_password("password2")
         user2.save()
-
-        # Login required to create cases
-        self.client.login(username="user1", password="")
 
     def test_login_correct(self) -> None:
         """
