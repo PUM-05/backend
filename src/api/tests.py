@@ -364,22 +364,22 @@ class APITests(TestCase):
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
-        url = ("/api/stats/medium?start_time=" + start_time.isoformat() + "&end_time=" +
+        url = ("/api/stats/medium?start-time=" + start_time.isoformat() + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/medium?start_time=" + "hallå" + "&end_time=" +
+        url = ("/api/stats/medium?start-time=" + "hallå" + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/medium?start_time=" + start_time.isoformat() +
-               "&end_time="+"18").replace("+", "%2B")
+        url = ("/api/stats/medium?start-time=" + start_time.isoformat() +
+               "&end-time="+"18").replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/medium?time_is_starting=" + start_time.isoformat() + "&end_time=" +
+        url = ("/api/stats/medium?time-is-starting=" + start_time.isoformat() + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
@@ -393,24 +393,24 @@ class APITests(TestCase):
         end_time = datetime.now(timezone.utc)
         start_time = end_time - timedelta(days=7)
 
-        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
+        url = ("/api/stats/category?start-time=" + start_time.isoformat() + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        url = ("/api/stats/category?start_time=" + "test" + "&end_time=" +
+        url = ("/api/stats/category?start-time=" + "test" + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
-        url = ("/api/stats/category?time_is_starting=" + start_time.isoformat() + "&end_time=" +
+        url = ("/api/stats/category?time-is-starting=" + start_time.isoformat() + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
 
         end_time = datetime.now(timezone.utc) + timedelta(days=1)
         start_time = end_time + timedelta(days=7)
-        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
+        url = ("/api/stats/category?start-time=" + start_time.isoformat() + "&end-time=" +
                end_time.isoformat()).replace("+", "%2B")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)

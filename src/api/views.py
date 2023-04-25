@@ -130,8 +130,8 @@ def medium(request: HttpRequest) -> HttpResponse:
     """
     params = request.GET.dict()
     try:
-        start_time_iso = params["start_time"]
-        end_time_iso = params["end_time"]
+        start_time_iso = params["start-time"]
+        end_time_iso = params["end-time"]
         start_time = datetime.fromisoformat(start_time_iso)
         end_time = datetime.fromisoformat(end_time_iso)
 
@@ -150,8 +150,8 @@ def stats_per_category(request: HttpRequest) -> HttpResponse:
     """
     params = request.GET.dict()
     try:
-        start_time_iso = params["start_time"]
-        end_time_iso = params["end_time"]
+        start_time_iso = params["start-time"]
+        end_time_iso = params["end-time"]
         start_time = datetime.fromisoformat(start_time_iso)
         end_time = datetime.fromisoformat(end_time_iso)
 
