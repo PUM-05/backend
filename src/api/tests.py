@@ -361,28 +361,18 @@ class APITests(TestCase):
         parameters to the endpoint with various inputs and asserting that the response status code
         is as expected.
         """
-        end_time = datetime.now(timezone.utc)
-        start_time = end_time - timedelta(days=7)
+        end = (datetime.now(timezone.utc)).isoformat()
+        start = (datetime.fromisoformat(end) - timedelta(days=7)).isoformat()
+        url_begin = "/api/stats/medium?start-time="
 
-        url = ("/api/stats/medium?start_time=" + start_time.isoformat() + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        urls = {url_begin + start + "&end-time=" + end: 200,
+                url_begin + "hallå" + "&end-time=" + end: 400,
+                url_begin + start + "&end-time=" + "18": 400,
+                "/api/stats/medium?time-is-starting=" + start + "&end-time=" + end: 400}
 
-        url = ("/api/stats/medium?start_time=" + "hallå" + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        url = ("/api/stats/medium?start_time=" + start_time.isoformat() +
-               "&end_time="+"18").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        url = ("/api/stats/medium?time_is_starting=" + start_time.isoformat() + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
+        for url in urls:
+            response = self.client.get(url.replace("+", "%2B"))
+            self.assertEqual(response.status_code, urls[url])
 
     def test_stats_per_category(self) -> None:
         """
@@ -390,30 +380,20 @@ class APITests(TestCase):
         parameters to the endpoint with various inputs and asserting that the response status code
         is as expected.
         """
-        end_time = datetime.now(timezone.utc)
-        start_time = end_time - timedelta(days=7)
+        end = (datetime.now(timezone.utc)).isoformat()
+        start = (datetime.fromisoformat(end) - timedelta(days=7)).isoformat()
+        new_end = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+        late_start = (datetime.fromisoformat(new_end) + timedelta(days=7)).isoformat()
+        url_begin = "/api/stats/category?start-time="
 
-        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        urls = {url_begin + start + "&end-time=" + end: 200,
+                url_begin + late_start + "&end-time=" + new_end: 200,
+                url_begin + "test" + "&end-time=" + end: 400,
+                "/api/stats/category?time-is-starting=" + start + "&end-time=" + end: 400}
 
-        url = ("/api/stats/category?start_time=" + "test" + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        url = ("/api/stats/category?time_is_starting=" + start_time.isoformat() + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        end_time = datetime.now(timezone.utc) + timedelta(days=1)
-        start_time = end_time + timedelta(days=7)
-        url = ("/api/stats/category?start_time=" + start_time.isoformat() + "&end_time=" +
-               end_time.isoformat()).replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        for url in urls:
+            response = self.client.get(url.replace("+", "%2B"))
+            self.assertEqual(response.status_code, urls[url])
 
     def test_stats_per_day(self) -> None:
         """
@@ -421,34 +401,19 @@ class APITests(TestCase):
         parameters to the endpoint with various inputs and asserting that the response status code
         is as expected.
         """
-        end_time = datetime.today() + timedelta(days=2)
-        end_time = end_time.astimezone(timezone.utc)
-        start_time = end_time - timedelta(days=7)
+        end = (datetime.today() + timedelta(days=2)).astimezone(timezone.utc)
+        start = (end - timedelta(days=7)).isoformat()
         delta = str(24 * 60 * 60)
+        late_start = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
+        neg_delta = str(-24 * 60 * 60)
+        url_begin = "/api/stats/periods?start-time="
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        urls = {url_begin + start + "&delta=" + delta + "&intervals=7": 200,
+                url_begin + late_start + "&delta=" + delta + "&intervals=7": 200,
+                url_begin + start + "&delta=" + neg_delta + "&intervals=7": 200,
+                url_begin + start + "&delta=" + delta + "&intervals=incorrect": 400,
+                "/api/stats/periods?wrong=" + start + "&delta=" + delta + "&intervals=7": 400}
 
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=arne").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        url = ("/api/stats/day?art_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 400)
-
-        new_time = datetime.now(timezone.utc) + timedelta(days=1)
-        url = ("/api/stats/day?start_time=" + new_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        delta = str(-24 * 60 * 60)
-        url = ("/api/stats/day?start_time=" + start_time.isoformat() + "&delta=" +
-               delta + "&time_periods=7").replace("+", "%2B")
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        for url in urls:
+            response = self.client.get(url.replace("+", "%2B"))
+            self.assertEqual(response.status_code, urls[url])
