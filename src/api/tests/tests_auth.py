@@ -1,6 +1,4 @@
-from datetime import timedelta
 from django.test import TestCase
-from api.models import Category, Case
 from django.contrib.auth.models import User
 
 CONTENT_TYPE_JSON = "application/json"

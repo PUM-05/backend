@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpRequest, QueryDict
+from django.http import HttpResponse, HttpRequest
 from django.views.decorators.http import require_http_methods
 from django.core.serializers.json import DjangoJSONEncoder
 import json

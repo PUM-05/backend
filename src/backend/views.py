@@ -1,6 +1,5 @@
 import mimetypes
 from django.http import FileResponse, HttpRequest, HttpResponse
-from django.shortcuts import render
 
 
 def static_files(request: HttpRequest) -> HttpResponse:

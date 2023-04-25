@@ -1,7 +1,6 @@
 from datetime import timedelta
 from django.test import TestCase
 from api.models import Category, Case
-from django.contrib.auth.models import User
 from datetime import datetime, timezone
 
 
