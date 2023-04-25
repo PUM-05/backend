@@ -183,6 +183,7 @@ class APITests(TestCase):
         self.assertEqual(data["cases"][3]["medium"], "phone")
         self.assertEqual(data["cases"][2]["medium"], "email")
         self.assertEqual(data["cases"][0]["notes"], "Johannes did nothing wrong.")
+        self.assertEqual(data["cases"][0]["category_name"], "test51")
 
     def test_get_case_with_parameters(self) -> None:
         """

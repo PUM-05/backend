@@ -216,6 +216,7 @@ Status: 200 (OK)
   "cases": [
     {
         "id": 1,
+        "case_id": 1,
         "notes": "Example notes 1",
         "medium": "phone",
         "customer_time": "PdDThhHmmMssS",
@@ -224,6 +225,7 @@ Status: 200 (OK)
         "created_at": "yyyy-mm-ddThh:mm:ssZ",
         "updated_at": "yyyy-mm-ddThh:mm:ssZ",
         "category_id": 1,
+        "category_name": "Example category 1",
     },
   ]
 }
