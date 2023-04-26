@@ -1,28 +1,23 @@
-import time
 from datetime import timedelta
-import json
 from django.test import TestCase
 from api.models import Category, Case
 from django.contrib.auth.models import User
-from datetime import datetime, timezone
+import json
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
-LOGOUT_PATH = "/api/logout"
-LOGIN_PATH = "/api/login"
-CHECK_PATH = "/api/check"
 
 
-class APITests(TestCase):
+class CasesTests(TestCase):
 
     def setUp(self) -> None:
-        Category.objects.create(name="test1")
-        Category.objects.create(name="test2")
-        Category.objects.create(name="test3")
-        Category.objects.create(name="test4")
-        p = Category.objects.create(name="test5")
-        Category.objects.create(name="test51", parent=p)
-        Category.objects.create(name="test52", parent=p)
+        Category.objects.create(name="category1")
+        Category.objects.create(name="category2")
+        Category.objects.create(name="category3")
+        Category.objects.create(name="category4")
+        p = Category.objects.create(name="category5")
+        Category.objects.create(name="subcategory51", parent=p)
+        Category.objects.create(name="subcategory52", parent=p)
 
         Case.objects.create()
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=5.3))
@@ -31,12 +26,12 @@ class APITests(TestCase):
                             customer_time=timedelta(seconds=90), category_id=3)
 
         Case.objects.create(medium="email", form_fill_time=timedelta(seconds=10),
-                            additional_time=timedelta(seconds=20), notes="This is a note.",
+                            additional_time=timedelta(seconds=20), notes="This is another note.",
                             customer_time=timedelta(seconds=90), category_id=3)
 
         Case.objects.create(medium="phone", form_fill_time=timedelta(seconds=10),
                             additional_time=timedelta(seconds=20),
-                            notes="Johannes did nothing wrong.",
+                            notes="This is the last note.",
                             customer_time=timedelta(seconds=90), category_id=6)
 
         user1 = User.objects.create(username="user1")
@@ -48,73 +43,6 @@ class APITests(TestCase):
 
         # Login required to create cases
         self.client.login(username="user1", password="")
-
-    def test_login_correct(self) -> None:
-        """
-        Tests that the login endpoint returns a 204 status code and a session
-        cookie when the login is successful.
-        """
-        response = self.client.post(LOGIN_PATH, {"username": "user1"},
-                                    content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(response.status_code, 204)
-        self.assertTrue(len(response.cookies["sessionid"].value) > 0)
-
-        response = self.client.post(LOGIN_PATH, {"username": "user2", "password": "password2"},
-                                    content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(response.status_code, 204)
-        self.assertTrue(len(response.cookies["sessionid"].value) > 0)
-
-    def test_login_incorrect(self) -> None:
-        """
-        Tests that the login endpoint returns a 401 status code when the login
-        is unsuccessful.
-        """
-        response = self.client.post(LOGIN_PATH, {"username": "user1", "password": "wrong"},
-                                    content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(response.status_code, 401)
-
-        response = self.client.post(LOGIN_PATH, {"username": "user2"},
-                                    content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(response.status_code, 403)
-
-        response = self.client.post(LOGIN_PATH, {"username": "wrong"},
-                                    content_type=CONTENT_TYPE_JSON)
-        self.assertEqual(response.status_code, 401)
-
-        response = self.client.post(LOGIN_PATH)
-        self.assertEqual(response.status_code, 400)
-
-    def test_logout(self) -> None:
-        """
-        Tests that the logout endpoint returns a 204 status code when the user
-        is logged in and a 401 status code when the user is not logged in.
-        """
-        self.client.post(LOGOUT_PATH)   # Logout due to login in SetUp
-
-        response = self.client.post(LOGOUT_PATH)
-        self.assertEqual(response.status_code, 401)
-
-        self.client.login(username="user1", password="")
-
-        response = self.client.post(LOGOUT_PATH)
-        self.assertEqual(response.status_code, 204)
-        response = self.client.post(CHECK_PATH)
-        self.assertEqual(response.status_code, 401)
-
-    def test_check(self) -> None:
-        """
-        Tests that the check endpoint returns a 204 status code when the user is
-        logged in and a 401 status code when the user is not logged in.
-        """
-        self.client.get(LOGOUT_PATH)  # Logout due to login in SetUp
-
-        response = self.client.get(CHECK_PATH)
-        self.assertEqual(response.status_code, 401)
-
-        self.client.login(username="user1", password="")
-
-        response = self.client.get(CHECK_PATH)
-        self.assertEqual(response.status_code, 204)
 
     def test_create_case_correct(self) -> None:
         """
@@ -182,8 +110,8 @@ class APITests(TestCase):
         self.assertEqual(data["cases"][4]["medium"], None)
         self.assertEqual(data["cases"][3]["medium"], "phone")
         self.assertEqual(data["cases"][2]["medium"], "email")
-        self.assertEqual(data["cases"][0]["notes"], "Johannes did nothing wrong.")
-        self.assertEqual(data["cases"][0]["category_name"], "test51")
+        self.assertEqual(data["cases"][0]["notes"], "This is the last note.")
+        self.assertEqual(data["cases"][0]["category_name"], "subcategory51")
 
     def test_get_case_with_parameters(self) -> None:
         """
@@ -222,7 +150,7 @@ class APITests(TestCase):
         }
 
         for param in parameters:
-            response = self.client.get(CASE_PATH+param)
+            response = self.client.get(CASE_PATH + param)
             content = response.content.decode()
             if parameters[param] == -1:
                 # -1 indicates that status 400 should be returned
@@ -242,18 +170,22 @@ class APITests(TestCase):
         """
         dictionary = {"notes": "new notes"}
 
-        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        response = self.client.patch(CASE_PATH + "/1", dictionary,
+                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
         self.assertEqual(Case.objects.get(id=1).notes, "new notes")
 
-        response = self.client.patch(CASE_PATH + "/99", dictionary, content_type=CONTENT_TYPE_JSON)
+        response = self.client.patch(CASE_PATH + "/99", dictionary,
+                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 404)
 
         dictionary = {"medium": "wrong"}
-        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        response = self.client.patch(CASE_PATH + "/1", dictionary,
+                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 400)
         dictionary = {"wrong": "medium"}
-        response = self.client.patch(CASE_PATH + "/1", dictionary, content_type=CONTENT_TYPE_JSON)
+        response = self.client.patch(CASE_PATH + "/1", dictionary,
+                                     content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 400)
 
     def test_nested_categories(self) -> None:
@@ -294,7 +226,7 @@ class APITests(TestCase):
         self.assertEqual(response.status_code, 204)
 
         no_cases_after = len(Case.objects.all())
-        self.assertEqual(no_cases_before, no_cases_after+1)
+        self.assertEqual(no_cases_before, no_cases_after + 1)
 
         response = self.client.delete(CASE_PATH + "/2", content_type=CONTENT_TYPE_JSON)
         self.assertEqual(response.status_code, 204)
@@ -355,66 +287,3 @@ class APITests(TestCase):
         edited_by_username = str(edited_by[0])
         self.assertEqual(len(edited_by), 1)
         self.assertEqual(edited_by_username, "user2")
-
-    def test_count_medium(self) -> None:
-        """
-        Tests the API endpoint /api/stats/medium by making various requests with different
-        parameters to the endpoint with various inputs and asserting that the response status code
-        is as expected.
-        """
-        end = (datetime.now(timezone.utc)).isoformat()
-        start = (datetime.fromisoformat(end) - timedelta(days=7)).isoformat()
-        url_begin = "/api/stats/medium?start-time="
-
-        urls = {url_begin + start + "&end-time=" + end: 200,
-                url_begin + "hallå" + "&end-time=" + end: 400,
-                url_begin + start + "&end-time=" + "18": 400,
-                "/api/stats/medium?time-is-starting=" + start + "&end-time=" + end: 400}
-
-        for url in urls:
-            response = self.client.get(url.replace("+", "%2B"))
-            self.assertEqual(response.status_code, urls[url])
-
-    def test_stats_per_category(self) -> None:
-        """
-        Tests the API endpoint /api/stats/category by making various requests with different
-        parameters to the endpoint with various inputs and asserting that the response status code
-        is as expected.
-        """
-        end = (datetime.now(timezone.utc)).isoformat()
-        start = (datetime.fromisoformat(end) - timedelta(days=7)).isoformat()
-        new_end = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
-        late_start = (datetime.fromisoformat(new_end) + timedelta(days=7)).isoformat()
-        url_begin = "/api/stats/category?start-time="
-
-        urls = {url_begin + start + "&end-time=" + end: 200,
-                url_begin + late_start + "&end-time=" + new_end: 200,
-                url_begin + "test" + "&end-time=" + end: 400,
-                "/api/stats/category?time-is-starting=" + start + "&end-time=" + end: 400}
-
-        for url in urls:
-            response = self.client.get(url.replace("+", "%2B"))
-            self.assertEqual(response.status_code, urls[url])
-
-    def test_stats_per_day(self) -> None:
-        """
-        Tests the API endpoint /api/stats/day by making various requests with different
-        parameters to the endpoint with various inputs and asserting that the response status code
-        is as expected.
-        """
-        end = (datetime.today() + timedelta(days=2)).astimezone(timezone.utc)
-        start = (end - timedelta(days=7)).isoformat()
-        delta = str(24 * 60 * 60)
-        late_start = (datetime.now(timezone.utc) + timedelta(days=1)).isoformat()
-        neg_delta = str(-24 * 60 * 60)
-        url_begin = "/api/stats/periods?start-time="
-
-        urls = {url_begin + start + "&delta=" + delta + "&intervals=7": 200,
-                url_begin + late_start + "&delta=" + delta + "&intervals=7": 200,
-                url_begin + start + "&delta=" + neg_delta + "&intervals=7": 200,
-                url_begin + start + "&delta=" + delta + "&intervals=incorrect": 400,
-                "/api/stats/periods?wrong=" + start + "&delta=" + delta + "&intervals=7": 400}
-
-        for url in urls:
-            response = self.client.get(url.replace("+", "%2B"))
-            self.assertEqual(response.status_code, urls[url])
