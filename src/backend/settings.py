@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "django_apscheduler",
     'corsheaders',
     'api.apps.ApiConfig',
     'django.contrib.admin',
