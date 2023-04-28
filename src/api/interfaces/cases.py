@@ -1,3 +1,4 @@
+import datetime
 from datetime import timedelta
 from typing import Any, Dict, List
 from django.db.models import Q
@@ -169,3 +170,13 @@ def delete_case(case_id: int) -> None:
     """
     case = Case.objects.get(id=case_id)
     case.delete()
+
+
+def clear_old_notes() -> None:
+    """
+    Deletes all notes older than 30 days.
+    """
+    cases = Case.objects.filter(edited_at__lt=datetime.now() - timedelta(days=90))
+    for case in cases:
+        case.notes = ""
+        case.save()

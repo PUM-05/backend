@@ -96,6 +96,21 @@ python src\manage.py test api
 python src\manage.py createsuperuser
 ```
 
+- Add all cron jobs:
+```
+python src\manage.py crontab add
+```
+
+- Show all active cron jobs:
+```
+python src\manage.py crontab show
+```
+
+- Remove all cron jobs:
+```
+python src\manage.py crontab remove
+```
+
 ## Deploy static files from frontend
 > Note:
 > This additionally requires that Node.js and npm are installed.

@@ -32,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'django_crontab',
     'corsheaders',
     'api.apps.ApiConfig',
     'django.contrib.admin',
@@ -130,3 +131,10 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Django Crontab
+# https://pypi.org/project/django-crontab/#description
+
+CRONJOBS = [
+    ('0 0 * * *', 'api.interfaces.cases.clear_old_notes')
+]
