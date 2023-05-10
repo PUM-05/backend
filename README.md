@@ -325,8 +325,8 @@ Returns the number of cases for each medium in the given time period.
 If a start or end date is not specified, the time period will be set to the beginning or end of time respectively.
 
 Query parameters:
-- `start: datetime`
-- `end: datetime`
+- `start-time: datetime`
+- `end-time: datetime`
 
 Request:
 ``` http
@@ -335,7 +335,7 @@ GET /api/stats/medium?<query>
 
 Example:
 ``` http
-GET /api/stats/medium?start=2023-01-01T00:00:00Z&end=2023-12-31T23:59:59Z
+GET /api/stats/medium?start-time=2023-01-01T00:00:00%2B00:00&end-time=2023-12-31T23:59:59Z
 ```
 
 Success response:
@@ -358,8 +358,8 @@ Status: 200 (OK)
 Returns data about each category in the given time period.
 
 Query parameters:
-- `start: datetime`
-- `end: datetime`
+- `start-time: datetime`
+- `end-time: datetime`
 
 Request:
 ``` http
@@ -407,7 +407,7 @@ GET /api/stats/periods?<query>
 Example:
 > Returns the number of cases for each hour on january 1 2023:
 ``` http
-GET /api/stats/periods?start-time=2023-01-01T00:00:00Z&delta=3600&intervals=24
+GET /api/stats/periods?start-time=2023-01-01T00:00:00%2B00:00&delta=3600&intervals=24
 ```
 
 Success response:
