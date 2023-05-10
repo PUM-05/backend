@@ -342,16 +342,10 @@ Success response:
 ``` smalltalk
 Status: 200 (OK)
 
-[
-    {
-        "medium": string,
-        "count": int
-    },
-    {
-        "medium": string,
-        "count": int
-    },
-]
+{
+    "phone": int
+    "email": int
+}
 ```
 
 ### Statistics per category
