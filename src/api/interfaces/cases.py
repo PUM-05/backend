@@ -52,9 +52,16 @@ def get_cases(parameters: Dict[str, Any]) -> Dict[str, Any]:
         # Change all datetimes to seconds and add category name
         keys = ["additional_time", "form_fill_time", "customer_time"]
         try:
-            case["category_name"] = Category.objects.get(id=case["category_id"]).name
+            category = Category.objects.get(id=case["category_id"])
+            if category.parent is not None:
+                case["parent_category_name"] = category.parent.name
+            else:
+                case["parent_category_name"] = None
+            case["category_name"] = category.name
         except Category.DoesNotExist:
             case["category_name"] = None
+            case["parent_category_name"] = None
+
         for key in keys:
             if case[key] is not None:
                 case[key] = case[key].total_seconds()

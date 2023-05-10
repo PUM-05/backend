@@ -161,6 +161,11 @@ class CasesTests(TestCase):
                 self.assertEqual(data["result_count"], parameters[param])
                 self.assertEqual(data["result_count"], len(data["cases"]))
 
+        response = self.client.get(CASE_PATH + "?category-id=6")
+        content = response.content.decode()
+        data = json.loads(content)
+        self.assertEqual(data["cases"][0]["parent_category_name"], "category5")
+
     def test_patch_case(self) -> None:
         """
         Test the ability to update a case using PATCH request. Tests that the endpoint returns 204

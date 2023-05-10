@@ -226,6 +226,7 @@ Status: 200 (OK)
         "updated_at": "yyyy-mm-ddThh:mm:ssZ",
         "category_id": 1,
         "category_name": "Example category 1",
+        "parent_category_name": "Example parent category 1",
     },
   ]
 }
