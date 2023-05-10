@@ -335,7 +335,7 @@ GET /api/stats/medium?<query>
 
 Example:
 ``` http
-GET /api/stats/medium?start-time=2023-01-01T00:00:00%2B00:00&end-time=2023-12-31T23:59:59Z
+GET /api/stats/medium?start-time=2023-01-01T00:00:00%2B00:00&end-time=2023-12-31T23:59:59%2B00:00
 ```
 
 Success response:
