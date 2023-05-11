@@ -135,7 +135,6 @@ def stats_per_medium(request: HttpRequest) -> HttpResponse:
         start_time = datetime.fromisoformat(start_time_iso)
         end_time = datetime.fromisoformat(end_time_iso)
 
-
     except KeyError as error:
         return HttpResponse(status=400, content="Key does not exist: " + str(error))
 
