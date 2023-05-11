@@ -133,7 +133,7 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     if "medium" in dictionary:
         medium = dictionary.get("medium")
         if medium == "phone" or medium == "email":
-            case.medium = medium
+            case.stats_per_medium = medium
         else:
             raise ValueError(f"Invalid medium: {medium}.")
 
