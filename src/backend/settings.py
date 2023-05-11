@@ -11,7 +11,12 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+from dotenv import load_dotenv, dotenv_values
 import os
+
+# Load .env file and save variables to dictionary "env_var".
+load_dotenv(".env")
+env_var = dotenv_values(".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,11 +85,28 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+production_env = {
+    'ENGINE': env_var["DB_ENGINE"],
+    'NAME': env_var["DB_NAME"],
+    'USER': env_var["DB_USER"],
+    'PASSWORD': env_var["DB_PASSWORD"],
+    'HOST': env_var["DB_HOST"],
+    'PORT': env_var["DB_PORT"],
+}
+
+test_env = {
+    'ENGINE': env_var["DB_TEST_ENGINE"],
+    'NAME': env_var["DB_TEST_NAME"]
+}
+
+if eval(env_var["PRODUCTION_ENV"]):
+    db_env = production_env
+else:
+    db_env = test_env
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': db_env
 }
 
 
