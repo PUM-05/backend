@@ -124,7 +124,7 @@ def case_categories(request: HttpRequest) -> HttpResponse:
 
 
 @require_http_methods({"GET"})
-def medium(request: HttpRequest) -> HttpResponse:
+def stats_per_medium(request: HttpRequest) -> HttpResponse:
     """
     Returns the number of cases per medium for a given time range as a JSON array.
     """
@@ -135,7 +135,10 @@ def medium(request: HttpRequest) -> HttpResponse:
         start_time = datetime.fromisoformat(start_time_iso)
         end_time = datetime.fromisoformat(end_time_iso)
 
-    except (KeyError, ValueError) as error:
+    except KeyError as error:
+        return HttpResponse(status=400, content="Key does not exist: " + str(error))
+
+    except ValueError as error:
         return HttpResponse(status=400, content=str(error))
 
     medium_stats = json.dumps(stats.get_medium_count(start_time, end_time))

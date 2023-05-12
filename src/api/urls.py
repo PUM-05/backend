@@ -8,7 +8,7 @@ urlpatterns = [
     path('case', views.case),
     path('case/<int:id>', views.case_id),
     path('case/categories', views.case_categories),
-    path('stats/medium', views.medium),
+    path('stats/medium', views.stats_per_medium),
     path('stats/category', views.stats_per_category),
     path('stats/periods', views.stats_per_period)
 ]
