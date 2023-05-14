@@ -30,7 +30,6 @@ def clear_old_notes() -> None:
         case.save()
 
 
-
 # The `close_old_connections` decorator ensures that database connections, that have become
 # unusable or are obsolete, are closed before and after your job has run. You should use it
 # to wrap any jobs that you schedule that access the Django database in any way.
@@ -65,7 +64,6 @@ class Command(BaseCommand):
             replace_existing=True,
         )
 
-
         scheduler.add_job(
             delete_old_job_executions,
             trigger=CronTrigger(
@@ -79,4 +77,3 @@ class Command(BaseCommand):
             scheduler.start()
         except KeyboardInterrupt:
             scheduler.shutdown()
-
