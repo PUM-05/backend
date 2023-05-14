@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+
 from django.conf import settings
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -27,6 +28,7 @@ def clear_old_notes() -> None:
     for case in old_cases:
         case.notes = None
         case.save()
+
 
 
 # The `close_old_connections` decorator ensures that database connections, that have become
@@ -63,6 +65,7 @@ class Command(BaseCommand):
             replace_existing=True,
         )
 
+
         scheduler.add_job(
             delete_old_job_executions,
             trigger=CronTrigger(
@@ -72,8 +75,8 @@ class Command(BaseCommand):
             max_instances=1,
             replace_existing=True,
         )
-
         try:
             scheduler.start()
         except KeyboardInterrupt:
             scheduler.shutdown()
+
