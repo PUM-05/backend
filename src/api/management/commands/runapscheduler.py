@@ -1,6 +1,4 @@
 from datetime import datetime, timedelta
-import logging
-
 from django.conf import settings
 
 from apscheduler.schedulers.blocking import BlockingScheduler
@@ -12,26 +10,30 @@ from django_apscheduler import util
 
 from api.models import Case
 
-logger = logging.getLogger(__name__)
 
-
-def clear_old_notes():
+# The `close_old_connections` decorator ensures that database connections, that have become
+# unusable or are obsolete, are closed before and after your job has run. You should use it
+# to wrap any jobs that you schedule that access the Django database in any way.
+@util.close_old_connections
+def clear_old_notes() -> None:
+    """
+    This job deletes all notes from cases that are older than 90 days.
+    """
     try:
         old_cases = Case.objects.get(edited_at__lte=datetime.now() - timedelta(days=90))
     except Case.DoesNotExist:
         return
 
     for case in old_cases:
-        case.notes = ""
+        case.notes = None
         case.save()
-    return
 
 
 # The `close_old_connections` decorator ensures that database connections, that have become
 # unusable or are obsolete, are closed before and after your job has run. You should use it
 # to wrap any jobs that you schedule that access the Django database in any way.
 @util.close_old_connections
-def delete_old_job_executions(max_age=604_800):
+def delete_old_job_executions(max_age: int = 604_800) -> None:
     """
     This job deletes APScheduler job execution entries older than `max_age` from the database.
     It helps to prevent the database from filling up with old historical records that are no
@@ -44,20 +46,22 @@ def delete_old_job_executions(max_age=604_800):
 
 
 class Command(BaseCommand):
+    """
+    Defines a management command that starts the APScheduler and adds the predefined jobs.
+    """
     help = "Runs APScheduler."
 
-    def handle(self, *args, **options):
+    def handle(self, *args, **options) -> None:
         scheduler = BlockingScheduler(timezone=settings.TIME_ZONE)
         scheduler.add_jobstore(DjangoJobStore(), "default")
 
         scheduler.add_job(
             clear_old_notes,
-            trigger=CronTrigger(hour="00", minute="00"),
-            id="clear_old_notes",  # The `id` assigned to each job MUST be unique
+            trigger=CronTrigger(hour="00", minute="00"),    # Midnight every day
+            id="clear_old_notes",
             max_instances=1,
             replace_existing=True,
         )
-        logger.info("Added job 'clear_old_notes'.")
 
         scheduler.add_job(
             delete_old_job_executions,
@@ -68,14 +72,8 @@ class Command(BaseCommand):
             max_instances=1,
             replace_existing=True,
         )
-        logger.info(
-            "Added weekly job: 'delete_old_job_executions'."
-        )
 
         try:
-            logger.info("Starting scheduler...")
             scheduler.start()
         except KeyboardInterrupt:
-            logger.info("Stopping scheduler...")
             scheduler.shutdown()
-            logger.info("Scheduler shut down successfully!")
