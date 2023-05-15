@@ -49,6 +49,7 @@ class CasesTests(TestCase):
         Test the endpoint for creating a case in the system with correct input values. Iterates 10
         times, each time creating a case with different input parameters and asserts that the
         response status code is 201, indicating that the case was created successfully.
+        Also tests that all the data sent in the POST request is correctly stored in the database.
         """
         for i in range(10):
             notes = "notes" + str(i)
@@ -63,8 +64,13 @@ class CasesTests(TestCase):
                           "category_id": category, "case_id": case_id}
 
             response = self.client.post(CASE_PATH, dictionary, content_type=CONTENT_TYPE_JSON)
-
             self.assertEqual(response.status_code, 201)
+
+            created_case_response = self.client.get(CASE_PATH + "?case-id=" + str(case_id))
+            created_case_content = created_case_response.content.decode()
+            created_case = json.loads(created_case_content)
+            for key in dictionary.keys():
+                self.assertEqual(dictionary[key], created_case["cases"][0][key])
 
     def test_create_case_incorrect_category(self) -> None:
         """
