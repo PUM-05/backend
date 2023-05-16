@@ -158,7 +158,10 @@ def stats_per_category(request: HttpRequest) -> HttpResponse:
         start_time = datetime.fromisoformat(start_time_iso)
         end_time = datetime.fromisoformat(end_time_iso)
 
-    except (KeyError, ValueError) as error:
+    except KeyError as error:
+        return HttpResponse(status=400, content="Key does not exist: " + str(error))
+
+    except ValueError as error:
         return HttpResponse(status=400, content=str(error))
 
     stats_per_category = json.dumps(stats.get_stats_per_category(start_time, end_time))
@@ -177,7 +180,10 @@ def stats_per_period(request: HttpRequest) -> HttpResponse:
         delta = timedelta(seconds=int(params["delta"]))
         time_periods = int(params["intervals"])
 
-    except (KeyError, ValueError) as error:
+    except KeyError as error:
+        return HttpResponse(status=400, content="Key does not exist: " + str(error))
+
+    except ValueError as error:
         return HttpResponse(status=400, content=str(error))
 
     stats_per_day = json.dumps(stats.get_stats_per_period(start_time, delta, time_periods))
