@@ -295,7 +295,7 @@ Returns all categories.
 
 Request:
 ``` http
-GET /api/categories/
+GET /api/case/categories/
 ```
 
 Success response:
@@ -322,7 +322,6 @@ Status: 200 (OK)
 ## Statistics
 ### Statistics per medium
 Returns the number of cases for each medium in the given time period.
-If a start or end date is not specified, the time period will be set to the beginning or end of time respectively.
 
 Query parameters:
 - `start-time: datetime`
