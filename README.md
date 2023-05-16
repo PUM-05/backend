@@ -295,7 +295,7 @@ Returns all categories.
 
 Request:
 ``` http
-GET /api/categories/
+GET /api/case/categories/
 ```
 
 Success response:
