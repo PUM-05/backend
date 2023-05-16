@@ -4,6 +4,7 @@ from api.models import Category, Case
 from datetime import datetime, timezone
 import json
 
+
 class StatsTests(TestCase):
 
     def setUp(self) -> None:
