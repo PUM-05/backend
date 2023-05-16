@@ -126,9 +126,7 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     if "case_id" in dictionary:
         case.case_id = dictionary.get("case_id")
 
-    add_times(case.customer_time, "customer_time", dictionary)
-    add_times(case.additional_time, "additional_time", dictionary)
-    add_times(case.form_fill_time, "form_fill_time", dictionary)
+    add_times(case, dictionary)
 
     if "medium" in dictionary:
         medium = dictionary.get("medium")
@@ -144,11 +142,19 @@ def fill_case(case: Case, dictionary: Dict) -> None:
             raise ValueError(f"Category with id {dictionary.get('category_id')} does not exist.")
 
         case.category = category
+    case.save()
 
 
-def add_times(case_time_field, key, dictionary):
-    if key in dictionary:
-        case_time_field = timedelta(seconds=dictionary[key] or 0)
+def add_times(case: Case, dictionary):
+    """
+    Adds times that exist in given dictionary to a case.
+    """
+    if "customer_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary["customer_time"] or 0)
+    if "additional_time" in dictionary:
+        case.additional_time = timedelta(seconds=dictionary["additional_time"] or 0)
+    if "form_fill_time" in dictionary:
+        case.form_fill_time = timedelta(seconds=dictionary["form_fill_time"] or 0)
 
 
 def get_case_categories() -> List[Dict]:
