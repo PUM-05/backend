@@ -126,9 +126,7 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     if "case_id" in dictionary:
         case.case_id = dictionary.get("case_id")
 
-    add_times(case, "customer_time", dictionary)
-    add_times(case, "additional_time", dictionary)
-    add_times(case, "form_fill_time", dictionary)
+    add_times(case, dictionary)
 
     if "medium" in dictionary:
         medium = dictionary.get("medium")
@@ -147,17 +145,16 @@ def fill_case(case: Case, dictionary: Dict) -> None:
     case.save()
 
 
-def add_times(case: Case, key: str, dictionary: Dict) -> None:
+def add_times(case: Case, dictionary):
     """
-    Adds a time to a case if it exists in the dictionary.
+    Adds times that exist in given dictionary to a case.
     """
-    if key in dictionary:
-        if key == "customer_time":
-            case.customer_time = timedelta(seconds=dictionary[key] or 0)
-        elif key == "additional_time":
-            case.additional_time = timedelta(seconds=dictionary[key] or 0)
-        elif key == "form_fill_time":
-            case.form_fill_time = timedelta(seconds=dictionary[key] or 0)
+    if "customer_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary["customer_time"] or 0)
+    if "additional_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary["additional_time"] or 0)
+    if "form_fill_time" in dictionary:
+        case.customer_time = timedelta(seconds=dictionary["form_fill_time"] or 0)
 
 
 def get_case_categories() -> List[Dict]:
