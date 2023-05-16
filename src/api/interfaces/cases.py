@@ -152,9 +152,9 @@ def add_times(case: Case, dictionary):
     if "customer_time" in dictionary:
         case.customer_time = timedelta(seconds=dictionary["customer_time"] or 0)
     if "additional_time" in dictionary:
-        case.customer_time = timedelta(seconds=dictionary["additional_time"] or 0)
+        case.additional_time = timedelta(seconds=dictionary["additional_time"] or 0)
     if "form_fill_time" in dictionary:
-        case.customer_time = timedelta(seconds=dictionary["form_fill_time"] or 0)
+        case.form_fill_time = timedelta(seconds=dictionary["form_fill_time"] or 0)
 
 
 def get_case_categories() -> List[Dict]:
