@@ -6,6 +6,7 @@ categories = {
     "category 1": None,
     "category 2": ["sub category 1", "sub category 2", "sub category 3"],
     "category 3": ["sub category 4", "sub category 5", "sub category 6"],
+    "category 4": ["sub category 7", "sub category 8", "sub category 9"],
 }
 
 
@@ -20,33 +21,33 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
     category_count = 0
 
     for category, sub_categories in categories.items():
+        category_count += 1
         current_parent_category_id = category_count
         query = f"""INSERT INTO api_category
                     (id, name, level, parent_id)
                     VALUES
                     ({category_count}, '{category}', 1, NULL)"""
         cursor.execute(query)
-        category_count += 1
 
         if sub_categories:
             for sub_category in sub_categories:
+                category_count += 1
                 query = f"""INSERT INTO api_category
                             (id, name, level, parent_id)
                             VALUES
                             ({category_count}, '{sub_category}', 2, '{current_parent_category_id}')"""
                 cursor.execute(query)
-                category_count += 1
     
     return category_count
 
 
 def random_time_str():
-    year = 2023
-    month = 5
-    day = random.randint(10, 17)
-    hour = random.randint(0, 23)
-    minute = random.randint(0, 59)
-    second = random.randint(0, 59)
+    year = "2023"
+    month = "05"
+    day = str(random.randint(1, 17)).rjust(2, '0')
+    hour = str(random.randint(8, 17)).rjust(2, '0')
+    minute = str(random.randint(0, 59)).rjust(2, '0')
+    second = str(random.randint(0, 49)).rjust(2, '0')
 
     return f"{year}-{month}-{day} {hour}:{minute}:{second}"
 
