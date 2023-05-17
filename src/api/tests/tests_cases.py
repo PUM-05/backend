@@ -1,6 +1,9 @@
-from datetime import timedelta
+from datetime import timedelta, datetime
+
+import pytz
 from django.test import TestCase
 from api.models import Category, Case
+from api import views
 from django.contrib.auth.models import User
 import json
 
@@ -298,3 +301,38 @@ class CasesTests(TestCase):
         edited_by_username = str(edited_by[0])
         self.assertEqual(len(edited_by), 1)
         self.assertEqual(edited_by_username, "user2")
+
+    def test_GDPR_clean(self) -> None:
+        """
+        Tests that the GDPR clean method works as intended.
+        """
+        time1 = datetime(
+            year=datetime.today().year,
+            month=datetime.today().month,
+            day=datetime.today().day,
+            tzinfo=pytz.UTC,
+        ) - timedelta(days=91)
+        time2 = datetime(
+            year=datetime.today().year,
+            month=datetime.today().month,
+            day=datetime.today().day,
+            tzinfo=pytz.UTC,
+        ) - timedelta(days=89)
+        case1 = Case()
+        case1.notes = "This note should be cleared"
+        case1.case_id = 4201
+        case1.save()
+        case2 = Case()
+        case2.notes = "This note should not be cleared"
+        case2.case_id = 4202
+        case2.save()
+        Case.objects.filter(case_id=4201).update(edited_at=time1)
+        Case.objects.filter(case_id=4202).update(edited_at=time2)
+
+        views.set_cleaned_for_testing()     # Sets
+        self.client.get(CASE_PATH + "?case_id=4201")
+
+        case1 = Case.objects.get(case_id=4201)
+        case2 = Case.objects.get(case_id=4202)
+        self.assertEqual(case1.notes, None)
+        self.assertEqual(case2.notes, "This note should not be cleared")
