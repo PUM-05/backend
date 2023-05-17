@@ -2,9 +2,32 @@ from datetime import timedelta
 from django.test import TestCase
 from api.models import Category, Case
 from datetime import datetime, timezone
+import json
 
 
 class StatsTests(TestCase):
+
+    def setUp(self) -> None:
+        Category.objects.create(name="stat_category1")
+        Category.objects.create(name="stat_category2")
+        p = Category.objects.create(name="stat_category3")
+        Category.objects.create(name="stat_subcategory31", parent=p)
+        Category.objects.create(name="stat_subcategory32", parent=p)
+
+        Case.objects.create(medium="phone",
+                            additional_time=timedelta(seconds=20),
+                            customer_time=timedelta(seconds=50),
+                            category_id=2)
+        Case.objects.create(medium="phone",
+                            additional_time=timedelta(seconds=30),
+                            customer_time=timedelta(seconds=50),
+                            category_id=2)
+        Case.objects.create(medium="phone",
+                            customer_time=timedelta(seconds=40),
+                            category_id=4)
+        Case.objects.create(medium="phone",
+                            customer_time=timedelta(seconds=160),
+                            category_id=5)
 
     def test_count_medium(self) -> None:
         """
@@ -37,14 +60,26 @@ class StatsTests(TestCase):
         late_start = (datetime.fromisoformat(new_end) + timedelta(days=7)).isoformat()
         url_begin = "/api/stats/category?start-time="
 
-        urls = {url_begin + start + "&end-time=" + end: 200,
-                url_begin + late_start + "&end-time=" + new_end: 200,
+        urls = {url_begin + late_start + "&end-time=" + new_end: 200,
                 url_begin + "incorrect" + "&end-time=" + end: 400,
                 "/api/stats/category?time-is-starting=" + start + "&end-time=" + end: 400}
-
         for url in urls:
             response = self.client.get(url.replace("+", "%2B"))
             self.assertEqual(response.status_code, urls[url])
+
+        url = url_begin + start + "&end-time=" + end
+        response = self.client.get(url.replace("+", "%2B"))
+        content = response.content.decode()
+        data = json.loads(content)
+        self.assertEqual(data[0]["customer_time"], 0)
+        self.assertEqual(data[0]["additional_time"], 0)
+        self.assertEqual(data[0]["form_fill_time"], 0)
+        self.assertEqual(data[1]["customer_time"], 100)
+        self.assertEqual(data[1]["additional_time"], 50)
+        self.assertEqual(data[2]["customer_time"], 200)
+        self.assertEqual(data[2]["subcategories"][0]["customer_time"], 40)
+        self.assertEqual(data[2]["subcategories"][1]["customer_time"], 160)
+        self.assertEqual(response.status_code, 200)
 
     def test_stats_per_day(self) -> None:
         """

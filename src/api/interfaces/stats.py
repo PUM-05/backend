@@ -34,18 +34,21 @@ def gather_stats_per_category(categories: List[Dict], start_time: datetime,
     subcategories within a given time range. Function is called recursively for subcategories.
     """
     result = []
-    time_fields = {"customer_time": 0, "additional_time": 0, "form_fill_time": 0}
     for category in categories:
+        time_fields = {"customer_time": 0, "additional_time": 0, "form_fill_time": 0}
+
         stat = {"category_id": category["id"], "category_name": category["name"]}
 
         cases = Case.objects.filter(created_at__gte=start_time, created_at__lte=end_time,
                                     category_id=category["id"])
+
         stat["count"] = cases.count()
 
         for key in time_fields:
-            time_sum = cases.aggregate(sum=Sum(key))["sum"]
+            time_sum = cases.aggregate(sum=Sum(key))['sum']
             if time_sum is not None:
-                time_fields[key] = time_sum.total_seconds()
+                time_fields[key] += time_sum.total_seconds()
+
             stat[key] = time_fields[key]
 
         if category.get("subcategories") is not None:
@@ -54,7 +57,8 @@ def gather_stats_per_category(categories: List[Dict], start_time: datetime,
             for substat in stat["subcategories"]:
                 stat["count"] += substat["count"]
                 for key in time_fields:
-                    time_fields[key] += stat.get(key)
+                    time_fields[key] += substat.get(key)
+                    stat[key] = time_fields[key]
 
         result.append(stat)
 
