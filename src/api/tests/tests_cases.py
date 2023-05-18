@@ -1,4 +1,4 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from django.test import TestCase
 from api.models import Category, Case
 from api import views
@@ -305,18 +305,14 @@ class CasesTests(TestCase):
         """
         Tests that the GDPR clean method works as intended.
         """
-        time1 = datetime(
-            year=datetime.today().year,
-            month=datetime.today().month,
-            day=datetime.today().day,
-            tzinfo=pytz.UTC,
-        ) - timedelta(days=91)
-        time2 = datetime(
-            year=datetime.today().year,
-            month=datetime.today().month,
-            day=datetime.today().day,
-            tzinfo=pytz.UTC,
-        ) - timedelta(days=89)
+        today = datetime(
+            year=datetime.utcnow().year,
+            month=datetime.utcnow().month,
+            day=datetime.utcnow().day,
+            tzinfo=timezone.utc,
+        )
+        time1 = today - timedelta(days=91)
+        time2 = today - timedelta(days=89)
         case1 = Case()
         case1.notes = "This note should be cleared"
         case1.case_id = 4201
