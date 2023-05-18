@@ -2,6 +2,7 @@ import sqlite3
 import random
 
 
+# Example categories to insert into the database.
 categories = {
     "category 1": None,
     "category 2": ["sub category 1", "sub category 2", "sub category 3"],
@@ -15,9 +16,6 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
     Insert categories into the database,
     and return the number of categories inserted.
     """
-    # Clear table
-    cursor.execute("DELETE FROM api_category")
-
     category_count = 0
 
     for category, sub_categories in categories.items():
@@ -41,7 +39,10 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
     return category_count
 
 
-def random_time_str():
+def random_time_str() -> str:
+    """
+    Return a random time string in the format of "YYYY-MM-DD HH:MM:SS".
+    """
     year = "2023"
     month = "05"
     day = str(random.randint(1, 17)).rjust(2, '0')
@@ -52,7 +53,10 @@ def random_time_str():
     return f"{year}-{month}-{day} {hour}:{minute}:{second}"
 
 
-def get_random_case_insert_query(categories: int):
+def insert_random_case(categories: int, cursor: sqlite3.Cursor) -> None:
+    """
+    Insert a random case into the database.
+    """
     medium = random.choice(["phone", "email"])
     customer_time = random.randint(1, 10) * 1000000
     additional_time = random.randint(1, 10) * 1000000
@@ -62,40 +66,43 @@ def get_random_case_insert_query(categories: int):
     case_id = random.randint(1, 1000)
     category_id = random.randint(1, categories)
 
-
-    return f"""INSERT INTO api_case
+    query = f"""INSERT INTO api_case
                 (medium, customer_time, additional_time, created_at, edited_at, case_id, category_id) 
                 VALUES 
                 ('{medium}', {customer_time}, {additional_time}, '{created_at}', '{edited_at}', {case_id}, {category_id})"""
+    cursor.execute(query)
 
 
-def add_example_data():
+def add_example_data(db_path: str):
+    """
+    Add example data to the database.
+    """
     try:
-        sqliteConnection = sqlite3.connect('db.sqlite3')
+        sqliteConnection = sqlite3.connect(db_path)
         cursor = sqliteConnection.cursor()
-        print("Successfully Connected to SQLite.")
 
+        # Clear categories
+        cursor.execute("DELETE FROM api_category")
+        # Insert new categories
         category_count = insert_categories(cursor)
 
         # Clear cases
         cursor.execute("DELETE FROM api_case")
-
+        # Insert new cases
         for _ in range(100):
-            cursor.execute(get_random_case_insert_query(category_count))
+            insert_random_case(category_count, cursor)
 
         sqliteConnection.commit()
-        print("Record inserted successfully into SqliteDb_developers table ", cursor.rowcount)
+        print(f"Data inserted successfully into {db_path}.")
         cursor.close()
 
     except sqlite3.Error as error:
-        print("Failed to insert data into sqlite table.", error)
+        print("Failed to insert data.", error)
 
     finally:
         if sqliteConnection:
             sqliteConnection.close()
-            print("The SQLite connection is closed.")
 
 
 if __name__ == "__main__":
     add_example_data()
-    print("Done.")
