@@ -31,10 +31,10 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
         if sub_categories:
             for sub_category in sub_categories:
                 category_count += 1
-                query = f"""INSERT INTO api_category
-                            (id, name, level, parent_id)
-                            VALUES
-                            ({category_count}, '{sub_category}', 2, '{current_parent_category_id}')"""
+                query = f"""INSERT INTO api_category'
+                    (id, name, level, parent_id)
+                    VALUES
+                    ({category_count}, '{sub_category}', 2, '{current_parent_category_id}')"""
                 cursor.execute(query)
     
     return category_count
