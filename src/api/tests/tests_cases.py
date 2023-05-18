@@ -4,7 +4,6 @@ from api.models import Category, Case
 from api import views
 from django.contrib.auth.models import User
 import json
-import pytz
 
 CASE_PATH = "/api/case"
 CONTENT_TYPE_JSON = "application/json"
