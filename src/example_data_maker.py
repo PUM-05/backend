@@ -1,3 +1,4 @@
+import os
 import sqlite3
 import random
 
@@ -104,5 +105,23 @@ def add_example_data(db_path: str):
             sqliteConnection.close()
 
 
+def cli():
+    """
+    Command line interface for adding example data to the database.
+    """
+    db_path = "src/db.sqlite3"
+
+    if not os.path.isfile(db_path):
+        print(f"Database not found at {db_path}.")
+        return
+
+    print(f"This action will delete all cases and categories in {db_path}. Continue? (y/n)")
+
+    if input().lower() == "y":
+        add_example_data(db_path)
+    else:
+        print("Action cancelled.")
+
+
 if __name__ == "__main__":
-    add_example_data()
+    cli()
