@@ -68,9 +68,10 @@ def insert_random_case(categories: int, cursor: sqlite3.Cursor) -> None:
     category_id = random.randint(1, categories)
 
     query = f"""INSERT INTO api_case
-                (medium, customer_time, additional_time, created_at, edited_at, case_id, category_id) 
-                VALUES 
-                ('{medium}', {customer_time}, {additional_time}, '{created_at}', '{edited_at}', {case_id}, {category_id})"""
+        (medium, customer_time, additional_time, created_at, edited_at, case_id, category_id)
+        VALUES
+        ('{medium}', {customer_time}, {additional_time}, '{created_at}', '{edited_at}', {case_id},
+         {category_id})"""
     cursor.execute(query)
 
 
