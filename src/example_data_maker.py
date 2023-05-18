@@ -36,7 +36,7 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
                     VALUES
                     ({category_count}, '{sub_category}', 2, '{current_parent_category_id}')"""
                 cursor.execute(query)
-    
+
     return category_count
 
 
