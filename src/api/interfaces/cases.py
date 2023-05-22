@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import timedelta, datetime, timezone
 from typing import Any, Dict, List
 from django.db.models import Q
 from api.models import Category, Case
@@ -186,3 +186,18 @@ def delete_case(case_id: int) -> None:
     """
     case = Case.objects.get(id=case_id)
     case.delete()
+
+
+def remove_old_notes() -> None:
+    """
+    Removes notes from cases older than 90 days.
+    """
+    before_date = datetime.now(timezone.utc) - timedelta(days=90)
+    Case.objects.filter(
+        edited_at__lt=datetime(
+            year=before_date.year,
+            month=before_date.month,
+            day=before_date.day,
+            tzinfo=timezone.utc
+        )
+    ).update(notes=None)
