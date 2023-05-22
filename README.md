@@ -47,6 +47,29 @@ source .venv/bin/activate
 pip install -r requirements/requirements.txt
 ```
 
+- Add .env file in root with the following content:
+```
+PRODUCTION_ENV=False
+
+# --- The production-database, used when 'PRODUCTION_ENV=True' ---
+DB_ENGINE=django.db.backends.postgresql
+# Name of PostgreSQL database, e.g. db_name
+DB_NAME=db_name
+# Name of user, e.g. john
+DB_USER=john
+# Password of user, e.g. johnpassword
+DB_PASSWORD=johnpassword
+# PostgreSQL database host, e.g. localhost (if locally hosted)
+DB_HOST=localhost
+# PostgreSQL database port, e.g. 5432
+DB_PORT=5432
+
+# --- The test-database, used when 'PRODUCTION_ENV=False' ---
+DB_TEST_ENGINE=django.db.backends.sqlite3
+DB_TEST_NAME=BASE_DIR / 'db.sqlite3'
+
+```
+
 - Setup local database:
 ```
 python3 src/manage.py migrate
@@ -86,6 +109,29 @@ Set-ExecutionPolicy -ExecutionPolicy AllSigned
 pip install -r requirements\requirements.txt
 ```
 
+- Add .env file in root with the following content:
+```
+PRODUCTION_ENV=False
+
+# --- The production-database, used when 'PRODUCTION_ENV=True' ---
+DB_ENGINE=django.db.backends.postgresql
+# Name of PostgreSQL database, e.g. db_name
+DB_NAME=db_name
+# Name of user, e.g. john
+DB_USER=john
+# Password of user, e.g. johnpassword
+DB_PASSWORD=johnpassword
+# PostgreSQL database host, e.g. localhost (if locally hosted)
+DB_HOST=localhost
+# PostgreSQL database port, e.g. 5432
+DB_PORT=5432
+
+# --- The test-database, used when 'PRODUCTION_ENV=False' ---
+DB_TEST_ENGINE=django.db.backends.sqlite3
+DB_TEST_NAME=BASE_DIR / 'db.sqlite3'
+
+```
+
 - Setup local database:
 ```
 python src\manage.py migrate
@@ -100,6 +146,9 @@ python src\manage.py test api
 ```
 python src\manage.py createsuperuser
 ```
+
+## Important note regarding .env file and PostgreSQL
+- If PRODUCT_ENV field in .env file is set to true you need to install PostgreSQL and create a database with it (see [Django documentation regarding PostgreSQL](https://docs.djangoproject.com/en/4.2/ref/databases/#postgresql-notes) for more information).
 
 ## Deploy static files from frontend
 > Note:
