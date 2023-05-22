@@ -17,13 +17,16 @@ class StatsTests(TestCase):
         Case.objects.create(medium="phone",
                             additional_time=timedelta(seconds=20),
                             customer_time=timedelta(seconds=50),
+                            form_fill_time=timedelta(seconds=10),
                             category_id=2)
         Case.objects.create(medium="phone",
                             additional_time=timedelta(seconds=30),
                             customer_time=timedelta(seconds=50),
+                            form_fill_time=timedelta(seconds=20),
                             category_id=2)
         Case.objects.create(medium="phone",
                             customer_time=timedelta(seconds=40),
+                            form_fill_time=timedelta(seconds=30),
                             category_id=4)
         Case.objects.create(medium="phone",
                             customer_time=timedelta(seconds=160),
@@ -81,7 +84,7 @@ class StatsTests(TestCase):
         self.assertEqual(data[2]["subcategories"][1]["customer_time"], 160)
         self.assertEqual(response.status_code, 200)
 
-    def test_stats_per_day(self) -> None:
+    def test_stats_per_period(self) -> None:
         """
         Tests the API endpoint /api/stats/day by making various requests with different
         parameters to the endpoint with various inputs and asserting that the response status code
@@ -103,3 +106,9 @@ class StatsTests(TestCase):
         for url in urls:
             response = self.client.get(url.replace("+", "%2B"))
             self.assertEqual(response.status_code, urls[url])
+
+        response = self.client.get("/api/stats/periods?start-time=2000-01-01T00:00:00%2B00:00&delta=9999999999&intervals=1")
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content.decode())
+        self.assertEqual(data[0]["count"], 4)
+        self.assertEqual(data[0]["total_form_fill_time"], 60)

@@ -75,10 +75,19 @@ def get_stats_per_period(start_time: datetime, delta: timedelta, time_periods: i
         start = start_time + delta*i
         end = start + delta
         if delta.seconds < 0:
-            num_cases = Case.objects.filter(created_at__gte=end, created_at__lte=start).count()
+            case_query_set = Case.objects.filter(created_at__gte=end, created_at__lte=start)
         else:
-            num_cases = Case.objects.filter(created_at__gte=start, created_at__lte=end).count()
-        stat = {"start": start.isoformat(), "end": end.isoformat(), "count": num_cases}
+            case_query_set = Case.objects.filter(created_at__gte=start, created_at__lte=end)
+
+        num_cases = case_query_set.count()
+        form_fill_time = case_query_set.aggregate(sum=Sum("form_fill_time"))['sum']
+        if form_fill_time is not None:
+            total_form_fill_time = form_fill_time.total_seconds()
+        else:
+            total_form_fill_time = 0
+
+        stat = {"start": start.isoformat(), "end": end.isoformat(), "count": num_cases,
+                "total_form_fill_time": total_form_fill_time}
         dates.append(stat)
 
     return dates

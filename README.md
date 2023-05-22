@@ -412,6 +412,7 @@ Status: 200 (OK)
         "start": datetime,
         "end": datetime,
         "count": int
+        "total_form_fill_time": int (seconds),
     },
     ...
 ]
