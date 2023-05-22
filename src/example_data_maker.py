@@ -88,6 +88,8 @@ def add_example_data(db_path: str):
         sqliteConnection = sqlite3.connect(db_path)
         cursor = sqliteConnection.cursor()
 
+        print("Adding example data to the database...")
+
         # Clear categories
         cursor.execute("DELETE FROM api_category")
         # Insert new categories
