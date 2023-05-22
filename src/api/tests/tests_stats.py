@@ -107,7 +107,9 @@ class StatsTests(TestCase):
             response = self.client.get(url.replace("+", "%2B"))
             self.assertEqual(response.status_code, urls[url])
 
-        response = self.client.get("/api/stats/periods?start-time=2000-01-01T00:00:00%2B00:00&delta=9999999999&intervals=1")
+        response = self.client.get(
+            "/api/stats/periods?start-time=2000-01-01T00:00:00%2B00:00&delta=9999999999&intervals=1"
+        )
         self.assertEqual(response.status_code, 200)
         data = json.loads(response.content.decode())
         self.assertEqual(data[0]["count"], 4)
