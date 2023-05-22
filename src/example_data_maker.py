@@ -1,6 +1,12 @@
 import os
 import sqlite3
 import random
+from datetime import datetime, timedelta
+
+"""
+This script can be used to add example data to the
+local SQLite database for testing purposes.
+"""
 
 
 # Example categories to insert into the database.
@@ -31,37 +37,36 @@ def insert_categories(cursor: sqlite3.Cursor) -> int:
         if sub_categories:
             for sub_category in sub_categories:
                 category_count += 1
-                query = f"""INSERT INTO api_category'
+                query = f"""INSERT INTO api_category
                     (id, name, level, parent_id)
                     VALUES
-                    ({category_count}, '{sub_category}', 2, '{current_parent_category_id}')"""
+                    ({category_count}, '{sub_category}', 2, {current_parent_category_id})"""
                 cursor.execute(query)
 
     return category_count
 
 
-def random_time_str() -> str:
+def random_time_str(delta_seconds: int) -> str:
     """
-    Return a random time string in the format of "YYYY-MM-DD HH:MM:SS".
+    Return a random time string in the format of "YYYY-MM-DD HH:MM:SS"
+    between the current time and the current time minus delta_seconds.
     """
-    year = "2023"
-    month = "05"
-    day = str(random.randint(1, 17)).rjust(2, '0')
-    hour = str(random.randint(8, 17)).rjust(2, '0')
-    minute = str(random.randint(0, 59)).rjust(2, '0')
-    second = str(random.randint(0, 49)).rjust(2, '0')
+    start_datetime = datetime.today() - timedelta(seconds=delta_seconds)
+    start_offset = delta_seconds * random.random()
 
-    return f"{year}-{month}-{day} {hour}:{minute}:{second}"
+    random_datetime = start_datetime + timedelta(seconds=start_offset)
+
+    return random_datetime.strftime("%Y-%m-%d %H:%M:%S")
 
 
-def insert_random_case(categories: int, cursor: sqlite3.Cursor) -> None:
+def insert_random_case(categories: int, cursor: sqlite3.Cursor, delta_seconds: int) -> None:
     """
     Insert a random case into the database.
     """
     medium = random.choice(["phone", "email"])
     customer_time = random.randint(1, 10) * 1000000
     additional_time = random.randint(1, 10) * 1000000
-    time = random_time_str()
+    time = random_time_str(delta_seconds)
     created_at = time
     edited_at = time
     case_id = random.randint(1, 1000)
@@ -91,8 +96,8 @@ def add_example_data(db_path: str):
         # Clear cases
         cursor.execute("DELETE FROM api_case")
         # Insert new cases
-        for _ in range(100):
-            insert_random_case(category_count, cursor)
+        for _ in range(10_000):
+            insert_random_case(category_count, cursor, 60 * 60 * 24 * 100)
 
         sqliteConnection.commit()
         print(f"Data inserted successfully into {db_path}.")
