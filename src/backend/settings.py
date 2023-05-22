@@ -85,7 +85,7 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-if(env_var):
+if (env_var):
     production_env = {
         'ENGINE': env_var["DB_ENGINE"],
         'NAME': env_var["DB_NAME"],
